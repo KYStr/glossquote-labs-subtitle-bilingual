@@ -1,0 +1,5 @@
+{
+  "Command": "node --test test/release.test.mjs",
+  "Exit": 0,
+  "Phase": "Root-requested fixed entry redirects"
+}

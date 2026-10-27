@@ -1,0 +1,39 @@
+✔ RP01/02 fixed origin/slug, strict mode; no environmental or CLI origin injection (1.0397ms)
+✔ RP01/08 real CLI rejects missing/wrong/extra arguments before creating output (own copy) (396.8977ms)
+✔ RP03–07 real files: head-only bilingual SEO, exact robots/sitemap/security headers and M1 assets (166.0182ms)
+✔ RP03/08 identical rebuild reuses bytes and deterministic manifest without rewriting (153.3792ms)
+✔ RP03 check with missing release does not create files (87.779ms)
+✔ RP03/07/08 reject tampered runtime; check/build preserve every existing byte (168.802ms)
+✔ RP03/07/08 reject extra site file; check/build preserve every existing byte (144.9605ms)
+✔ RP03/07/08 reject extra site directory; check/build preserve every existing byte (174.7942ms)
+✔ RP03/07/08 reject missing expected asset; check/build preserve every existing byte (151.6167ms)
+✔ RP03/07/08 reject extra output-root file; check/build preserve every existing byte (152.2847ms)
+✔ RP03/07/08 reject manifest incorrectly included in site; check/build preserve every existing byte (150.5572ms)
+✔ RP03/07/08 reject wrong manifest origin; check/build preserve every existing byte (155.7889ms)
+✔ RP03/07/08 reject duplicate manifest path; check/build preserve every existing byte (148.3048ms)
+✔ RP03/07/08 reject traversal manifest path; check/build preserve every existing byte (141.9717ms)
+✔ RP03/07/08 reject unknown manifest property; check/build preserve every existing byte (146.0469ms)
+✔ RP03/07/08 reject polluted robots; check/build preserve every existing byte (156.3029ms)
+✔ RP03/07/08 reject extra sitemap URL; check/build preserve every existing byte (158.3736ms)
+✔ RP03/07/08 reject weakened CSP; check/build preserve every existing byte (150.9403ms)
+✔ RP07 asset and manifest forged together still rejected (161.1094ms)
+✔ RP04/07 semantic auditor rejects wrong-domain canonical even with matching forged manifest hashes (435.6461ms)
+✔ RP04/07 semantic auditor rejects duplicate canonical even with matching forged manifest hashes (354.8793ms)
+✔ RP04/07 semantic auditor rejects wrong English alternate even with matching forged manifest hashes (255.7808ms)
+✔ RP04/07 semantic auditor rejects duplicate alternate language even with matching forged manifest hashes (326.5449ms)
+✔ RP04/07 semantic auditor rejects robots in body instead of head even with matching forged manifest hashes (207.2324ms)
+✔ RP04/07 semantic auditor rejects incorrect visible heading even with matching forged manifest hashes (195.9152ms)
+✔ RP07/08 changed source rejected before output creation and after existing build (559.2086ms)
+✔ RP03 unknown source file rejected before writes (149.9426ms)
+✔ RP03 unmanaged empty or partial output is not adopted or overwritten (351.2111ms)
+✔ RP03 source-js junction rejected without following or changing it (301.8778ms)
+✔ RP03 site junction rejected without following or changing it (309.81ms)
+✔ RP03 release-root junction rejected without following or changing it (250.1337ms)
+ℹ tests 31
+ℹ suites 0
+ℹ pass 31
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6742.3029

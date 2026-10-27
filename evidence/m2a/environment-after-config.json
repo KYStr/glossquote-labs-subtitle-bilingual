@@ -1,0 +1,63 @@
+{
+  "Status": "PASS",
+  "MaximumPersistentPathLength": 4096,
+  "Snapshots": [
+    {
+      "Scope": "User",
+      "RegistryPath": "HKCU:\\Environment",
+      "RegistryType": "ExpandString",
+      "RawLength": 834,
+      "EntryCount": 16,
+      "EphemeralEntries": [],
+      "DuplicateEntries": [
+        "c:\\users\\123ik\\appdata\\local\\programs\\miktex\\miktex\\bin\\x64"
+      ],
+      "RawSha256": "3efe0b0eba15a12d5555fb191a204ce0048f87381d73108bac1d6d5d05b67ffb",
+      "EnvironmentValueCount": 18,
+      "EnvironmentKeySha256": "3a36b632b9e0143f2ff2b9e1c5b964e89bf192a4a3aa3ebc93ea8d0314ee7e5a",
+      "ProtectedValues": [
+        {
+          "Name": "TEMP",
+          "RegistryType": "ExpandString",
+          "RawLength": 32,
+          "RawSha256": "6419b675e0a677e2fa237deacbf7fd1b6af9f3685b28897b4349704d91d821c7"
+        },
+        {
+          "Name": "TMP",
+          "RegistryType": "ExpandString",
+          "RawLength": 32,
+          "RawSha256": "6419b675e0a677e2fa237deacbf7fd1b6af9f3685b28897b4349704d91d821c7"
+        }
+      ]
+    },
+    {
+      "Scope": "Machine",
+      "RegistryPath": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment",
+      "RegistryType": "String",
+      "RawLength": 1227,
+      "EntryCount": 30,
+      "EphemeralEntries": [],
+      "DuplicateEntries": [
+        "c:\\users\\123ik\\appdata\\local\\programs\\cursor\\resources\\app\\bin"
+      ],
+      "RawSha256": "52d7cb0c3e02b67714f1b0caefc8f92d5d2c365bb2513dc537d42207d8b56eb8",
+      "EnvironmentValueCount": 26,
+      "EnvironmentKeySha256": "a0f49688069fd5a21146e94fd22764caedcd3ffbe25dc60c716a6a398673ac82",
+      "ProtectedValues": [
+        {
+          "Name": "TEMP",
+          "RegistryType": "ExpandString",
+          "RawLength": 17,
+          "RawSha256": "99e709292d85386d0db9b41c1c3c80033d9a3ed03264a5b0a5fb69e87e1d9fdf"
+        },
+        {
+          "Name": "TMP",
+          "RegistryType": "ExpandString",
+          "RawLength": 17,
+          "RawSha256": "99e709292d85386d0db9b41c1c3c80033d9a3ed03264a5b0a5fb69e87e1d9fdf"
+        }
+      ]
+    }
+  ],
+  "Failures": []
+}

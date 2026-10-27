@@ -1,0 +1,10 @@
+{
+  "Status": "PASS",
+  "BeforeStatus": "PASS",
+  "AfterStatus": "PASS",
+  "InvocationSucceeded": true,
+  "CompleteSnapshotsEqual": true,
+  "Before": "environment-before.json",
+  "After": "environment-after.json",
+  "Scope": "Entire HKCU/HKLM Snapshots: PATH hash/type/length/ephemeral arrays, Environment-key fingerprints and protected TEMP/TMP values"
+}

@@ -1,0 +1,5 @@
+{"command":"npm test","exit":0,"signal":null,"error":null,"log":"npm-test-final.log"}
+{"command":"npm run check","exit":0,"signal":null,"error":null,"log":"npm-check-final.log"}
+{"command":"npm run build:release","exit":0,"signal":null,"error":null,"log":"npm-build-release-final.log"}
+{"command":"npm run check:release","exit":0,"signal":null,"error":null,"log":"npm-check-release-final.log"}
+{"status":"PASS","tests":{"tests":112,"pass":112,"fail":0,"skipped":0}}

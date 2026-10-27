@@ -1,0 +1,5 @@
+
+> glossquote-labs-subtitle-bilingual@0.1.0-m1 check
+> node scripts/check.mjs
+
+{"status":"PASS","files":16,"pages":2,"syntax":11}

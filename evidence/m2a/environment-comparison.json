@@ -1,0 +1,8 @@
+{
+  "Status": "PASS",
+  "CompleteSnapshotsEqual": true,
+  "RedirectPhaseSnapshotsEqual": true,
+  "BeforeStatus": "PASS",
+  "AfterStatus": "PASS",
+  "Scope": "Full HKCU/HKLM PATH hashes/type/length/ephemeral arrays, complete Environment fingerprints/TEMP/TMP"
+}

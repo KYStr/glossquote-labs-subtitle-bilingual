@@ -1,0 +1,11 @@
+{
+  "Status": "PASS",
+  "SourceFiles": 47,
+  "ReadonlyContracts": 13,
+  "UnexpectedPaths": [],
+  "NodeModulesExists": false,
+  "LockfileExists": false,
+  "TrackedDiff": "Empty because tool folder is untracked; not a Git commit/cleanliness proof",
+  "Browser": "NOT_RUN_USER_FOCUS_INCIDENT",
+  "Publication": "NOT_PUBLISHED"
+}

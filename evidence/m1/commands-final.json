@@ -1,0 +1,23 @@
+[
+  {
+    "Command": "node --version",
+    "Exit": 0,
+    "Output": "v24.14.0"
+  },
+  {
+    "Command": "node --test",
+    "Exit": 0,
+    "Tests": 81,
+    "Log": "test-03-final.log"
+  },
+  {
+    "Command": "node scripts/check.mjs",
+    "Exit": 0,
+    "Log": "check-02-final.log"
+  },
+  {
+    "Command": "node scripts/build.mjs",
+    "Exit": 0,
+    "Log": "build-01-final.log"
+  }
+]

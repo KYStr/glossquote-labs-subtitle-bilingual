@@ -1,0 +1,5 @@
+
+> glossquote-labs-subtitle-bilingual@0.1.0-m1 check:release
+> node scripts/release.mjs check
+
+{"status":"PASS","mode":"release-candidate","origin":"https://bilingual-subs.glossquote.com","toolSlug":"subtitle-bilingual","sourceFiles":16,"files":18,"siteBytes":81655,"manifestSha256":"9e3564dd4acbe8f89ed8f579a8964d8a7d15c84983c6145a86c964a7e116cbce","sourceFingerprint":"70979b1ef42cf37cae7034124f813e18f3553e1378a92bdd2cca03538dbf3b55","hosting":{"name":"glossquote-subtitle-bilingual","domain":"bilingual-subs.glossquote.com","assets":"./release-artifacts/site","sha256":"84a36563d8c93010a84c32b53589a81c6884b4d02d1c2f55b004521e8253cc49","runtime":"assets-only","deployed":false},"browser":"NOT_RUN_BY_THIS_OFFLINE_COMMAND","published":false}

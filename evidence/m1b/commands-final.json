@@ -1,0 +1,43 @@
+{
+  "status": "PASS",
+  "node": "v24.14.0",
+  "commands": [
+    {
+      "command": "npm test",
+      "exit": 0,
+      "signal": null,
+      "error": null,
+      "log": "npm-test-final.log"
+    },
+    {
+      "command": "npm run check",
+      "exit": 0,
+      "signal": null,
+      "error": null,
+      "log": "npm-check-final.log"
+    },
+    {
+      "command": "npm run build:release",
+      "exit": 0,
+      "signal": null,
+      "error": null,
+      "log": "npm-build-release-final.log"
+    },
+    {
+      "command": "npm run check:release",
+      "exit": 0,
+      "signal": null,
+      "error": null,
+      "log": "npm-check-release-final.log"
+    }
+  ],
+  "tests": {
+    "tests": 112,
+    "pass": 112,
+    "fail": 0,
+    "skipped": 0
+  },
+  "npmInvocation": "Existing npm-cli.js through current Node; shell:false/windowsHide:true; offline, update checks disabled, empty task-local user/global config and task-local cache; no install.",
+  "browser": "NOT_RUN_USER_FOCUS_INCIDENT",
+  "publication": "NOT_PUBLISHED"
+}

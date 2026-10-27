@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="description" content="在本機合併兩份 SRT 字幕，按時間重疊配對、檢查歧義並保留未配對字幕，再下載雙語 SRT。">
+  <title>雙語字幕合併｜Gloss Tools</title>
+  <link rel="stylesheet" href="./css/app.css">
+  <script type="module" src="./js/app.js"></script>
+</head>
+<body>
+  <a class="skip" href="#workspace">前往字幕工作區</a>
+  <header class="topbar">
+    <a href="https://glossquote.com/index.html">Gloss Tools</a>
+    <span>雙語字幕合併</span>
+    <nav aria-label="語言"><span aria-current="page">繁中</span> <a href="./en/index.html" aria-describedby="language-warning" lang="en" hreflang="en">English</a></nav>
+  </header>
+  <main id="workspace">
+    <p id="language-warning" class="language-warning">切換語言會離開本頁，尚未匯出的字幕與結果會遺失。</p>
+    <h1>把兩份 SRT 合成雙語字幕</h1>
+    <p class="intro">指定主字幕時間軸，按重疊時間配對兩種語言。先檢查歧義，再下載；未配對句預設保留。</p>
+    <section class="sources" aria-labelledby="sources-title">
+      <h2 id="sources-title">兩份來源字幕</h2>
+      <p id="file-help">僅 UTF-8 SRT；每份最多 1,048,576 bytes、3,000 句。來源檔不會被修改；內容只在本頁記憶體處理。</p>
+      <div class="file-grid">
+        <div class="field">
+          <label for="main-file">主字幕 SRT（決定配對後的時間軸）</label>
+          <input type="file" id="main-file" accept=".srt,application/x-subrip,text/plain" aria-describedby="file-help main-meta main-error">
+          <p id="main-meta">尚未選擇檔案</p><p id="main-error" class="error"></p>
+        </div>
+        <div class="field">
+          <label for="secondary-file">副字幕 SRT（接在主文下方）</label>
+          <input type="file" id="secondary-file" accept=".srt,application/x-subrip,text/plain" aria-describedby="file-help secondary-meta secondary-error">
+          <p id="secondary-meta">尚未選擇檔案</p><p id="secondary-error" class="error"></p>
+        </div>
+      </div>
+      <div class="actions">
+        <button type="button" id="start" class="primary" disabled>開始配對</button>
+        <button type="button" id="cancel" disabled>取消工作</button>
+        <button type="button" id="swap" disabled>交換主、副字幕</button>
+        <button type="button" id="clear">清除全部</button>
+      </div>
+      <p id="status" role="status" aria-live="polite">選擇兩份 UTF-8 SRT，指定主、副字幕後開始。</p>
+      <p id="job-error" class="error" role="alert"></p>
+    </section>
+    <section class="summary" aria-labelledby="summary-title">
+      <h2 id="summary-title">配對摘要</h2>
+      <p id="summary">開始配對後，這裡會列出所有來源句及其狀態。</p>
+    </section>
+    <div class="worksheet">
+      <section aria-labelledby="review-title" class="review-pane">
+        <h2 id="review-title">逐句檢查與配對</h2>
+        <p>兩側互為唯一最佳且 IoU 至少 1/2 才自動配對。人工選擇會固定；取代自動配對或低於門檻時先確認。</p>
+        <section aria-labelledby="main-review-title"><h3 id="main-review-title">主字幕</h3><div id="main-cues"></div></section>
+        <section aria-labelledby="secondary-review-title"><h3 id="secondary-review-title">副字幕</h3><div id="secondary-cues"></div></section>
+        <section id="candidate-panel" class="candidate-panel" aria-labelledby="candidate-title" hidden>
+          <h3 id="candidate-title">選擇另一份字幕中的一句</h3>
+          <p id="candidate-source" class="cue-text"></p>
+          <p id="candidate-help">依精確 IoU 降冪，再按來源句號排序。低於 1/2 的選擇需再次確認。</p>
+          <label for="candidate-select">配對對象與時間重疊比</label>
+          <select id="candidate-select" aria-describedby="candidate-help candidate-text"></select>
+          <p id="candidate-text" class="cue-text"></p>
+          <div class="actions"><button type="button" id="apply-pair">配對這兩句</button><button type="button" id="close-candidates">關閉候選</button></div>
+        </section>
+      </section>
+      <section aria-labelledby="preview-title" class="preview-pane">
+        <h2 id="preview-title">主時間軸輸出預覽</h2>
+        <p>配對句採主字幕時間，先主文、後副文。獨立保留句沿用自身時間，依開始時間排序。</p>
+        <div id="preview"><p class="empty-state">配對完成且歧義全部解決後，這裡會顯示實際輸出。</p></div>
+      </section>
+    </div>
+    <section class="download" aria-labelledby="download-title">
+      <h2 id="download-title">下載字幕</h2>
+      <p id="output-count"></p>
+      <button type="button" id="download" disabled>下載雙語 SRT</button>
+      <p>檔名 bilingual-subtitles.srt；UTF-8、無 BOM。結果沒有自動到期時間；重新選檔、交換、清除或離開頁面會清除目前工作。</p>
+    </section>
+    <section class="help" aria-labelledby="faq-title">
+      <h2 id="faq-title">使用前後想知道的事</h2>
+      <details><summary>會自動翻譯字幕嗎？</summary><p>不會，只按時間配對兩份既有字幕。</p></details>
+      <details><summary>什麼情況會自動配對？</summary><p>交集／聯集比例至少 0.5，且兩側都是唯一最佳配對時才自動配對。</p></details>
+      <details><summary>有歧義時可以直接下載嗎？</summary><p>不行。逐一配候選或明確保留分開字幕後，才會建立下載結果。選擇已自動配對的候選會先說明要取代哪一對；取消保留原結果。</p></details>
+      <details><summary>可以手動配對低於 0.5 的句子嗎？</summary><p>可以，但確認前會顯示精確 IoU 與警告；取消不會改動既有配對。</p></details>
+      <details><summary>可以把自動配對的句子保留為分開字幕嗎？</summary><p>可以。確認會列出被釋出的另一句；取消不改動原配對。</p></details>
+      <details><summary>未配對字幕會消失嗎？</summary><p>不會；預設保留。若要排除，需逐句選擇並確認；已排除句也能還原。</p></details>
+      <details><summary>支援哪些字幕檔？</summary><p>本版定義受限 UTF-8 SRT 格式，不承諾支援所有 SRT 變體或播放器。支援 LF、CRLF、CR 換行與單一 BOM；序號從 1 連續遞增、時間無額外設定、每句至少一行非空文字。</p></details>
+      <details><summary>候選配對太多怎麼辦？</summary><p>超過 50,000 組符合時間門檻的候選時，整批停止並提示縮短字幕片段；不提供部分結果。</p></details>
+      <details><summary>字幕會上傳嗎？</summary><p>不會。檔案在本機記憶體處理，沒有上傳、AI 或轉檔。切換語言會遺失目前工作；下載檔仍由瀏覽器與作業系統管理。</p></details>
+    </section>
+    <noscript>此工具需要 JavaScript 解析與合併本機字幕；請啟用 JavaScript 後重試。</noscript>
+  </main>
+  <dialog id="confirmation" aria-labelledby="confirmation-title" aria-describedby="confirmation-body">
+    <h2 id="confirmation-title">確認這次修改</h2><div id="confirmation-body"></div>
+    <div class="actions"><button type="button" id="confirm-no" autofocus>取消，保留原結果</button><button type="button" id="confirm-yes" class="primary">確認修改</button></div>
+  </dialog>
+  <footer>Gloss Tools by GlossQuote · 本機字幕工作表 · <a href="https://glossquote.com/index.html">返回工具首頁</a></footer>
+</body>
+</html>

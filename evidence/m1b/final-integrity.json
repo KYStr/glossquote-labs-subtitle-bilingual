@@ -1,0 +1,16 @@
+{
+  "Status": "PASS",
+  "SourceFilesVerified": 52,
+  "SourceBytes": 277511,
+  "ArtifactFilesVerified": 18,
+  "ArtifactBytes": 86684,
+  "ProtectedM1FilesUnchanged": 55,
+  "BytesSha256Failures": [],
+  "PortableDocumentLinksChecked": 40,
+  "LinkFailures": [],
+  "SourceArtifactRecordSha256": "dd0af5af1006027489c6881b774eb0eabf3c81eed969c736da34b767cb6bd68a",
+  "ReleaseManifestSha256": "7c0572463e122fe437d97d5f1d47381bbc53f4a30e1006f11fe0d8195c2ffc00",
+  "Browser": "NOT_RUN_USER_FOCUS_INCIDENT",
+  "Publication": "NOT_PUBLISHED",
+  "Hosting": "NOT_DEPLOYED"
+}

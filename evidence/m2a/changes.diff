@@ -1,0 +1,867 @@
+diff --git a/evidence/m2a/before/HANDOFF.md b/HANDOFF.md
+index 4352ccb..10ee174 100644
+--- a/evidence/m2a/before/HANDOFF.md
++++ b/HANDOFF.md
+@@ -95,3 +95,61 @@ Node v24.14.0；現有 npm-cli.js 以 task-local 空白 user/global config、cac
+ browser/視覺/原生/真機/AT、實際 Worker/下載/headers/Network/Storage 仍 **NOT_RUN_USER_FOCUS_INCIDENT**。index/follow 與安全 headers 只是候選檔，不代表網站已上線或 hosting 配置已生效。來源變更須後續有界任務重新審核 M1 pin；若不完整輸出由外部修改或中斷造成，工具會拒絕自動修復，需要主代理決定安全復原範圍。本輪沒有此類阻擋，也沒有未決的產品分歧。
+ 
+ source/reviewed/released commit 仍 NOT_CREATED；GitHub/Cloudflare/DNS/hosting/首頁仍 NOT_PUBLISHED/NOT_DEPLOYED。沒讀憑證、沒安裝服務、沒付費、沒啟動 browser/native、沒留下背景服務。原 M1 ZIP/證據保留，沒有另外製作交付 ZIP；由主代理整合單一外層 archive。下一步只交主代理獨立核驗並按既定 gates 決定後續工作；本輪停在 M1B。
++
++## B20-50-M2A — 設定與入口發布準備（2026-10-27）
++
++**M2A 本地準備完成，等待 root 審查／另行放行 M2B；沒有推送或部署。** 本輪與 root 同步收到的入口修正已一併完成。原 M1/M1B 的文件、紀錄及凍結包保留，以下追加新事實，不覆寫歷史。
++
++### 瀏覽器既有範圍
++
++root 真正執行 `.runs/batch20-browser-release-2026-10-25/isolated/b20-50-r1`：Browser 145.0.7632.6，32 PASS／6 NOT_RUN／0 FAIL，prohibited=[]，parent cleanup PASS；root 已看 320px 成功圖。[參照與來源 hashes](evidence/m2a/browser-reference.json)。本輪只讀該結果，沒有重啟 browser/native/server，也沒有把 Node suite 冒充 browser。
++
++六項是兩語各自的 private late-event delivery、真200%文字放大、native/真機/AT，保持 NOT_RUN。不是所有人工項通過，更不是外部驗收通過。原功能對話 requested Sol/max；未切模型／另委派，backend 身分未自行證實。
++
++### 實際修改
++
++新增 `wrangler.jsonc`、`scripts/validate-m2a.mjs`、`scripts/record-m2a.mjs`、[M2A-RELEASE.md](M2A-RELEASE.md)；修改 `scripts/release.mjs`、`scripts/check.mjs`、`test/release.test.mjs`、`test/merge.test.mjs`、`test/toolchain.test.mjs`、本 HANDOFF 與 TASK-ENTRY。package/.gitignore 不變。測試合成輸出與暫存全部移至 m2a；沒有寫 m1/m1b 舊證據。
++
++Hosting 固定 `glossquote-subtitle-bilingual`／2026-10-24，workers_dev/preview_urls/send_metrics/observability/logs/invocation_logs/traces 全 false；唯一 bilingual-subs.glossquote.com custom domain，assets=`./release-artifacts/site`、run_worker_first=false、html_handling/not_found_handling=none，build=`npm run build:release`。沒有新增 edge runtime/main、bindings、storage、vars、帳戶／憑證或權限。checker 用固定 canonical JSON 拒絕漂移、unknown/duplicate keys、analytics 等覆寫。
++
++兩語正式頁沒有候選／未發布標語，所以不改頁面或新增臆測刪除規則。release auditor 另拒絕兩語及 encoded 發布階段標語、inline/remote analytics script、額外 stylesheet/asset；真正產品語彙「字幕候選」保留。
++
++root 指出 bare入口需顯式轉址，本輪新增 release `site/_redirects`，三行真LF與final LF：
++
++```text
++/ /index.html 301
++/en /en/index.html 301
++/en/ /en/index.html 301
++```
++
++site現在18檔／81,655 bytes；sibling manifest5,237 bytes，合計19檔／86,892 bytes。**唯一產物變更為新增_redirects與更新manifest；原17個site檔（HTML/JS/CSS/CSP/robots/sitemap）逐byte不變。** public/dist/runtime與所有舊evidence也不變。
++
++原 release 18檔完整備份在 `evidence/m2a/before/release-artifacts/`，舊manifest SHA仍為 `7c0572463e122fe437d97d5f1d47381bbc53f4a30e1006f11fe0d8195c2ffc00`。升級只接受此已知舊版：來源pin、完整舊17檔、manifest及完整backup全部通過才寫新_redirects，最後更新已驗證manifest。任何未知、改過、缺少檔案／backup皆拒絕，不遞迴刪除，不覆蓋未管理資料。乾淨來源可直接生成新版；新版一致重建只重用。
++
++### 真實驗證與版本收據
++
++|階段／命令|Exit|結果|
++|---|---:|---|
++|設定階段 release tests|0|72/72|
++|設定階段完整四個npm命令|0|153/153；root追加轉址前的收據，保留原樣|
++|含轉址 release tests|0|81/81|
++|最終 npm test|0|162/162，0 FAIL、0 skipped|
++|最終 npm run check|0|preview16檔／2語頁／11 JS＋固定hosting|
++|最終 npm run build:release|0|migrated=true；18 site檔／81,655 bytes|
++|最終 npm run check:release|0|最終來源／設定／manifest／bytes通過|
++
++Node v24.14.0，零新增依賴。既有 npm-cli.js 以 offline、空任務內 user/global config、任務內 cache 執行；直接 child 均 shell:false/windowsHide:true。沒有 npm install、Wrangler CLI、server、實際新 browser 或部署。
++
++設定階段 [153項收據](evidence/m2a/commands-final.json)／[72項測試](evidence/m2a/release-tests-01.log)；入口追加後 [81項測試](evidence/m2a/release-redirects-tests-01.log)；最終 [commands](evidence/m2a/final/commands-final.json)、[test](evidence/m2a/final/npm-test-final.log)、[check](evidence/m2a/final/npm-check-final.log)、[build](evidence/m2a/final/npm-build-release-final.log)、[check:release](evidence/m2a/final/npm-check-release-final.log)。沒有刪除失敗或冒填未跑；本輪測試均無失敗／略過。
++
++完整 Environment [before](evidence/m2a/environment-before.json)／[after](evidence/m2a/environment-after.json) 都 PASS，[全輪及入口階段 Snapshots](evidence/m2a/environment-comparison.json) 相同，涵蓋 HKCU/HKLM PATH type/hash/length/ephemeral arrays、完整 Environment/TEMP/TMP指紋。[設定階段比較](evidence/m2a/environment-comparison-config.json) 另保留。無持久環境或 Git/auth設定寫入；沒有 publication 區段，Git settings guard 未執行。
++
++### 固定 bytes／hashes 與剩餘範圍
++
++- 新manifest SHA-256：`9e3564dd4acbe8f89ed8f579a8964d8a7d15c84983c6145a86c964a7e116cbce`。
++- _redirects（65 bytes）SHA-256：`9e47a2579b08f461b1124de1e42a1bde7a79ca29d77401104f6f432d8be90e1e`。
++- wrangler.jsonc SHA-256：`84a36563d8c93010a84c32b53589a81c6884b4d02d1c2f55b004521e8253cc49`。
++
++[source/artifact固定清單](evidence/m2a/source-artifact-manifest.json) 列每檔bytes/SHA、source-set與artifact-set hashes、140檔初始baseline的實際差異、所有舊證據／public／dist／17原site檔保護及舊18檔backup核對。source清單排除dist/evidence/release-artifacts，產物單列；空tracked diff不當作已提交證明。M2A以最終清單為準，M1/M1B清單保留其版本範圍。
++
++50站真實 `/`／`/en`／`/en/` 301、Cloudflare hosting headers/DNS、Wrangler schema/dry-run、M2B公開來源及外部驗收仍未執行。六個 browser NOT_RUN 不變；既有32個 PASS因HTML/runtime/CSP不變沿用，不重新做瀏覽器測試。root將審查本M2A再另行放行M2B。沒有新ZIP、GitHub/push/deploy、付費、憑證存取或新服務，也未改共享首頁／看板／其他工具。
+warning: in the working copy of 'tool-projects/50-subtitle-bilingual/M2A-RELEASE.md', LF will be replaced by CRLF the next time Git touches it
+diff --git a/evidence/m2a/before/EMPTY b/M2A-RELEASE.md
+index e69de29..304bb29 100644
+--- a/evidence/m2a/before/EMPTY
++++ b/M2A-RELEASE.md
+@@ -0,0 +1,90 @@
++# B20-50-M2A — 本地發布設定準備
++
++2026-10-27，Asia/Taipei。**本輪僅 M2A；沒有 GitHub 推送、部署、DNS／首頁整合或新 ZIP。** 延續原對話 requested Sol/max；沒有切模型、委派，backend 身分未由自述確認。root 審查本輪固定來源後，另行放行 M2B。
++
++## 已有瀏覽器證據
++
++root 的 `.runs/batch20-browser-release-2026-10-25/isolated/b20-50-r1` 有 38 案：**32 PASS、6 NOT_RUN、0 FAIL、prohibited 空**；Browser 145.0.7632.6、parent cleanup PASS。root 已看過 320px 成功截圖。本輪只讀取既有結果，未重啟 browser/native/server；參照與原檔 SHA 見 [browser-reference.json](evidence/m2a/browser-reference.json)。
++
++六項仍是中英各自的 delayed private event delivery、真 200% 文字放大、native/真機/AT 範圍。沒有把這些改 PASS，也沒有宣稱外部驗收通過；前輪「未跑 browser」描述保留為歷史，以本輪追加交接說明新狀態。
++
++## 產物保存與頁面 bytes
++
++原 `release-artifacts/` 全部 18 檔已複製到 `evidence/m2a/before/release-artifacts/`，每檔 bytes/SHA-256 已核對。備份中的原 artifact manifest SHA-256 為 `7c0572463e122fe437d97d5f1d47381bbc53f4a30e1006f11fe0d8195c2ffc00`，不覆寫。
++
++兩語正式 HTML 都**沒有候選／未發布標語**，因此沒有新增刪除規則，也沒有硬改任何頁面。原 17 個 site 檔（81,590 bytes）全部保留。依 root 在本輪追加的入口修正，只新增 `_redirects`，更新 sibling manifest；public/dist、產品 runtime、M1/M1B 舊證據及凍結包不改寫。
++
++### root 追加的入口轉址
++
++root 實測 42 站指出 `html_handling:none` 時 bare `/` 與 `/en/` 需顯式入口規則。本工具新增固定 `_redirects`，**每行為真 LF，含最後 LF**：
++
++```text
++/ /index.html 301
++/en /en/index.html 301
++/en/ /en/index.html 301
++```
++
++site allowlist 為原 17 檔加 `_redirects`，現在 18 檔；manifest 覆蓋新增檔，canonical 仍是兩個 `/index.html` 路徑，CSP/原 HTML/JS/CSS/robots/sitemap 不改。現有舊產物只能在 manifest 固定 7c057…、完整原 17 檔與完整備份都符合預期時受控升級；其他修改／缺檔／污染或備份不符都拒絕，絕不自動刪除。升級只建立 `_redirects` 並最後更新已驗證的 manifest；新版一致重建仍僅重用。這是根目錄入口準備，沒有在本輪對 50 站實際部署或 HTTP 301 實測。
++
++## 固定 hosting 設定
++
++[wrangler.jsonc](wrangler.jsonc) 是 canonical JSON 的 JSONC 子集；本地 checker 限定固定 bytes，拒絕 duplicate key、comment/隱藏 override、未知欄位及格式漂移，不是任意 JSONC 的編輯器。
++
++|欄位|固定值|
++|---|---|
++|name|glossquote-subtitle-bilingual|
++|compatibility_date|2026-10-24|
++|workers_dev / preview_urls / send_metrics|全部 false|
++|observability.enabled|false|
++|observability.logs.enabled / invocation_logs|全部 false|
++|observability.traces.enabled|false|
++|routes|唯一 bilingual-subs.glossquote.com，custom_domain=true|
++|assets.directory|./release-artifacts/site|
++|assets.run_worker_first|false|
++|assets.html_handling / not_found_handling|全部 none|
++|build.command|npm run build:release|
++
++沒有 edge Worker handler/main、bindings、storage、vars、account id、憑證或權限擴充。既有瀏覽器 merge-worker JS 是靜態資產，bytes 保持不變。設定不進 site，build:release/check:release 先驗設定再驗來源與產物；`npm run check` 也會核對 hosting 設定。
++
++本輪使用 workers-best-practices 技能與官方文件核對欄位。技能預設建議當日 compatibility date／啟用 observability；這兩點依本次使用者指定的日期與 no-telemetry 契約處理，不新增審批門檻。Assets-only 可省略 main，且 run_worker_first=false 走 asset 配對；參照 [Wrangler configuration](https://developers.cloudflare.com/workers/wrangler/configuration/) 與 [Static assets configuration](https://developers.cloudflare.com/workers/static-assets/binding/)。`html_handling=none` 對應停止內建 HTML rewrite，[官方 HTML handling 說明](https://developers.cloudflare.com/workers/static-assets/routing/advanced/html-handling/)；`invocation_logs=false` 的位置亦與 [Workers Logs 文件](https://developers.cloudflare.com/workers/observability/logs/workers-logs/) 相符。
++
++**未安裝／執行 Wrangler，未做 dry-run 或向帳戶送 API。** 本地檢查驗的是此固定契約，不冒充某一已安裝 Wrangler schema 或 Cloudflare 實際接收／hosting 生效。M2B／部署仍由 root 依核准版本及權限處理。
++
++## 新增驗證
++
++release HTML auditor 除原 title/description/H1/canonical/hreflang/robots 外，額外拒絕發布階段文案、兩語 encoded 文案、額外／inline／remote analytics script、未知 stylesheet/資產與事件屬性；產品語彙「字幕候選／candidate」仍允許。實體檔仍按固定 M1 source pin 重建 expected bytes，asset+manifest 一起修改不能通過。
++
++原設定階段新增 41 個負例／設定驗證，與原 31 個 release tests 合併為 **72/72** 針對性測試通過。包含錯 name/date/domain/path、wildcard/extra route、workers.dev/preview/metrics/logs/traces 開啟、runtime/analytics/storage/env override、重複 JSON key、missing/非檔 config，以及中英標語／analytics。root 追加入口後，再加精確規則、302／外域／缺列／literal backslash-n／多列篡改與受控升級／備份拒絕測試；每個負例只寫 m2a 合成 copy，並驗失敗不破壞既有 bytes。
++
++完整最終命令：
++
++```text
++node scripts/validate-m2a.mjs
++# 依序透過既有 npm-cli.js 執行：
++npm test
++npm run check
++npm run build:release
++npm run check:release
++```
++
++runner 使用 offline、空白任務內 npm user/global config、任務內 cache；所有直接 child `shell:false/windowsHide:true`。沒有 install 或全域設定修改。三個既有 test 的變動只包含新增發布負例／config copy 及將合成輸出移到 `evidence/m2a/`，不寫原 m1/m1b 證據。
++
++root 追加轉址前的設定階段完整驗證為 **153/153**，四個命令均 exit 0；[該輪收據](evidence/m2a/commands-final.json) 原樣保留，不冒充含轉址的最終版本。最終 exit／完整數量見 [final/commands-final.json](evidence/m2a/final/commands-final.json)，來源／產物／backup 完整 hashes 與原 140 檔 baseline 的差異見 [source-artifact-manifest.json](evidence/m2a/source-artifact-manifest.json)。前後環境比對完整 Snapshots，包含 HKCU/HKLM PATH type/hash/length/ephemeral arrays 與完整 Environment-key/TEMP/TMP；沒有 Git publication 區段，Git guard 不冒填 PASS。
++
++本輪禁止的 browser/native、server、安裝、憑證、Git 全域設定、push/deploy、新 ZIP 都未執行；實際 hosting、M2B source publication、外部驗收仍未完成。唯一下一步是交 root 檢查固定來源，再依另行指令推進 M2B。
++
++## 最終固定驗證（含入口追加）
++
++|命令|Exit|實際結果|
++|---|---:|---|
++|針對性 release tests（含轉址）|0|81/81，0 skipped|
++|npm test|0|162/162，0 FAIL、0 skipped|
++|npm run check|0|16 preview 檔／2 語頁／11 JS，固定 hosting 設定通過|
++|npm run build:release|0|migrated=true，18 site 檔／81,655 bytes|
++|npm run check:release|0|同版來源／設定／產物通過|
++
++`_redirects`：65 bytes，SHA-256 `9e47a2579b08f461b1124de1e42a1bde7a79ca29d77401104f6f432d8be90e1e`。
++
++新 artifact manifest：5,237 bytes，SHA-256 `9e3564dd4acbe8f89ed8f579a8964d8a7d15c84983c6145a86c964a7e116cbce`。整個 release-artifacts 為19檔／86,892 bytes；舊18檔完整備份的 manifest仍是7c057…。
++
++wrangler.jsonc SHA-256 `84a36563d8c93010a84c32b53589a81c6884b4d02d1c2f55b004521e8253cc49`。本輪兩個階段及整輪 Environment 的完整 Snapshots 均相同，見 [環境比較](evidence/m2a/environment-comparison.json)。所有必要命令已對最終版本執行；不重跑未變瀏覽器案例，不把50站 live轉址、Wrangler dry-run、六項人工／私有事件缺口或外驗冒填PASS。
+warning: in the working copy of 'tool-projects/50-subtitle-bilingual/evidence/m2a/before/release-artifacts/manifest.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tool-projects/50-subtitle-bilingual/release-artifacts/manifest.json', LF will be replaced by CRLF the next time Git touches it
+diff --git a/evidence/m2a/before/release-artifacts/manifest.json b/release-artifacts/manifest.json
+index 8dbf0df..a7fa76b 100644
+--- a/evidence/m2a/before/release-artifacts/manifest.json
++++ b/release-artifacts/manifest.json
+@@ -9,6 +9,11 @@
+       "bytes": 387,
+       "sha256": "880fec0a40c39d13a85c87b85eb719ab2bf46247b6e49b8a3f34ec04c57253a8"
+     },
++    {
++      "path": "_redirects",
++      "bytes": 65,
++      "sha256": "9e47a2579b08f461b1124de1e42a1bde7a79ca29d77401104f6f432d8be90e1e"
++    },
+     {
+       "path": "css/app.css",
+       "bytes": 8332,
+warning: in the working copy of 'tool-projects/50-subtitle-bilingual/release-artifacts/site/_redirects', LF will be replaced by CRLF the next time Git touches it
+diff --git a/evidence/m2a/before/EMPTY b/release-artifacts/site/_redirects
+index e69de29..969b6da 100644
+--- a/evidence/m2a/before/EMPTY
++++ b/release-artifacts/site/_redirects
+@@ -0,0 +1,3 @@
++/ /index.html 301
++/en /en/index.html 301
++/en/ /en/index.html 301
+warning: in the working copy of 'tool-projects/50-subtitle-bilingual/evidence/m2a/before/scripts/check.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tool-projects/50-subtitle-bilingual/scripts/check.mjs', LF will be replaced by CRLF the next time Git touches it
+diff --git a/evidence/m2a/before/scripts/check.mjs b/scripts/check.mjs
+index c534d3c..ebb5bbc 100644
+--- a/evidence/m2a/before/scripts/check.mjs
++++ b/scripts/check.mjs
+@@ -3,6 +3,7 @@ import { resolve } from 'node:path';
+ import { fileURLToPath } from 'node:url';
+ import { spawnSync } from 'node:child_process';
+ import { PUBLIC_FILES, inspectTree } from './files.mjs';
++import { checkHostingConfig } from './release.mjs';
+ 
+ const root = fileURLToPath(new URL('../', import.meta.url));
+ export async function checkPublic(directory = resolve(root, 'public')) {
+@@ -64,6 +65,6 @@ export async function checkPackage() {
+ }
+ 
+ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+-  try { await checkPackage(); console.log(JSON.stringify({ status: 'PASS', ...await checkPublic() })); }
++  try { await checkPackage(); const hosting = await checkHostingConfig(); console.log(JSON.stringify({ status: 'PASS', ...await checkPublic(), hosting })); }
+   catch (error) { console.error(error.message); process.exitCode = 1; }
+ }
+warning: in the working copy of 'tool-projects/50-subtitle-bilingual/scripts/record-m2a.mjs', LF will be replaced by CRLF the next time Git touches it
+diff --git a/evidence/m2a/before/EMPTY b/scripts/record-m2a.mjs
+index e69de29..0b023df 100644
+--- a/evidence/m2a/before/EMPTY
++++ b/scripts/record-m2a.mjs
+@@ -0,0 +1,69 @@
++import { readFile, readdir, lstat, writeFile } from 'node:fs/promises';
++import { resolve } from 'node:path';
++import { fileURLToPath } from 'node:url';
++import { sha256 } from './files.mjs';
++
++const root = fileURLToPath(new URL('../', import.meta.url)), evidence = resolve(root, 'evidence/m2a');
++async function inventory(directory, prefix = '', skip = () => false) {
++  const rows = [];
++  for (const name of (await readdir(directory)).sort()) {
++    const path = prefix ? `${prefix}/${name}` : name; if (skip(path)) continue;
++    const target = resolve(directory, name), info = await lstat(target);
++    if (info.isSymbolicLink()) throw new Error('M2A_LINK_REJECTED');
++    if (info.isDirectory()) rows.push(...await inventory(target, path, skip));
++    else if (info.isFile()) { const bytes = await readFile(target); rows.push({ path, bytes: bytes.length, sha256: sha256(bytes) }); }
++    else throw new Error('M2A_NONFILE_REJECTED');
++  }
++  return rows;
++}
++const baseline = JSON.parse(await readFile(resolve(evidence, 'baseline.json'), 'utf8'));
++const current = await inventory(root, '', path => /^evidence\/m2a(\/|$)/.test(path));
++const before = new Map(baseline.map(row => [row.path, row])), after = new Map(current.map(row => [row.path, row]));
++const allowed = new Set(['scripts/release.mjs', 'scripts/check.mjs', 'scripts/validate-m2a.mjs', 'scripts/record-m2a.mjs',
++  'test/release.test.mjs', 'test/merge.test.mjs', 'test/toolchain.test.mjs', 'wrangler.jsonc', 'HANDOFF.md', 'TASK-ENTRY.md', 'M2A-RELEASE.md',
++  'release-artifacts/site/_redirects', 'release-artifacts/manifest.json']);
++const changes = [];
++for (const row of baseline) {
++  const now = after.get(row.path);
++  if (!now || row.bytes !== now.bytes || row.sha256 !== now.sha256) {
++    if (!allowed.has(row.path)) throw new Error(`PROTECTED_DRIFT: ${row.path}`);
++    changes.push({ path: row.path, kind: now ? 'modified' : 'deleted', before: row, after: now ?? null });
++  }
++}
++for (const row of current) if (!before.has(row.path)) {
++  if (!allowed.has(row.path)) throw new Error(`OUT_OF_SCOPE: ${row.path}`);
++  changes.push({ path: row.path, kind: 'added', before: null, after: row });
++}
++const protectedRows = baseline.filter(row => /^(public|dist|release-artifacts|evidence)\//.test(row.path) && row.path !== 'release-artifacts/manifest.json');
++const releaseBefore = baseline.filter(row => row.path.startsWith('release-artifacts/'));
++const backupRoot = resolve(evidence, 'before/release-artifacts');
++if ((await lstat(backupRoot)).isSymbolicLink()) throw new Error('OLD_RELEASE_BACKUP_LINK');
++if ((await inventory(backupRoot)).length !== releaseBefore.length) throw new Error('OLD_RELEASE_BACKUP_CLOSURE');
++for (const row of releaseBefore) {
++  const bytes = await readFile(resolve(evidence, 'before', row.path));
++  if (bytes.length !== row.bytes || sha256(bytes) !== row.sha256) throw new Error('OLD_RELEASE_BACKUP_DRIFT');
++}
++const sourceSkip = path => /^(dist|release-artifacts|evidence|node_modules|\.git)(\/|$)/.test(path);
++const sources = await inventory(root, '', sourceSkip), artifacts = await inventory(resolve(root, 'release-artifacts'));
++if (JSON.stringify(sources) !== JSON.stringify(await inventory(root, '', sourceSkip))) throw new Error('SOURCE_CHANGED_DURING_RECORD');
++const releaseManifest = await readFile(resolve(root, 'release-artifacts/manifest.json'));
++const releaseData = JSON.parse(releaseManifest.toString('utf8'));
++if (artifacts.length !== releaseData.files.length + 1) throw new Error('ARTIFACT_CLOSURE');
++for (const row of releaseData.files) {
++  const actual = artifacts.find(item => item.path === `site/${row.path}`);
++  if (!actual || actual.bytes !== row.bytes || actual.sha256 !== row.sha256) throw new Error('ARTIFACT_MANIFEST_DRIFT');
++}
++if (!(await readFile(resolve(root, 'release-artifacts/site/_redirects'))).equals(Buffer.from('/ /index.html 301\n/en /en/index.html 301\n/en/ /en/index.html 301\n'))) throw new Error('REDIRECTS_DRIFT');
++const record = { schemaVersion: 1, task: 'B20-50-M2A', date: '2026-10-27', timezone: 'Asia/Taipei',
++  status: 'M2A_LOCAL_PREPARATION_WAITING_ROOT_M2B', changes: changes.sort((a, b) => a.path.localeCompare(b.path, 'en')),
++  protectedUnchanged: protectedRows.length, oldReleaseBackupVerified: releaseBefore.length,
++  sourceFiles: sources.length, sourceBytes: sources.reduce((sum, row) => sum + row.bytes, 0), sourceSetSha256: sha256(JSON.stringify(sources)), sources,
++  artifactFiles: artifacts.length, artifactBytes: artifacts.reduce((sum, row) => sum + row.bytes, 0), artifactSetSha256: sha256(JSON.stringify(artifacts)), artifacts,
++  releaseManifestSha256: sha256(releaseManifest), wranglerSha256: sha256(await readFile(resolve(root, 'wrangler.jsonc'))),
++  historicalBrowserEvidence: { run: '.runs/batch20-browser-release-2026-10-25/isolated/b20-50-r1', pass: 32, notRun: 6, fail: 0 },
++  browserRerun: false, deployment: 'NOT_DEPLOYED', publication: 'NOT_PUBLISHED' };
++const text = JSON.stringify(record, null, 2) + '\n'; await writeFile(resolve(evidence, 'source-artifact-manifest.json'), text);
++console.log(JSON.stringify({ status: 'PASS', changed: changes.length, protectedUnchanged: protectedRows.length, oldReleaseBackupVerified: releaseBefore.length,
++  sourceFiles: record.sourceFiles, sourceBytes: record.sourceBytes, sourceSetSha256: record.sourceSetSha256,
++  artifactFiles: artifacts.length, artifactBytes: record.artifactBytes, artifactSetSha256: record.artifactSetSha256,
++  releaseManifestSha256: record.releaseManifestSha256, wranglerSha256: record.wranglerSha256, recordSha256: sha256(text) }));
+warning: in the working copy of 'tool-projects/50-subtitle-bilingual/evidence/m2a/before/scripts/release.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tool-projects/50-subtitle-bilingual/scripts/release.mjs', LF will be replaced by CRLF the next time Git touches it
+diff --git a/evidence/m2a/before/scripts/release.mjs b/scripts/release.mjs
+index e3ba0aa..0fe9990 100644
+--- a/evidence/m2a/before/scripts/release.mjs
++++ b/scripts/release.mjs
+@@ -1,4 +1,4 @@
+-import { lstat, readdir, readFile, mkdir, writeFile } from 'node:fs/promises';
++import { lstat, readdir, readFile, mkdir, writeFile, open } from 'node:fs/promises';
+ import { resolve, dirname } from 'node:path';
+ import { fileURLToPath } from 'node:url';
+ import { PUBLIC_FILES, inspectTree, sha256 } from './files.mjs';
+@@ -7,7 +7,8 @@ export const ORIGIN = 'https://bilingual-subs.glossquote.com';
+ export const TOOL_SLUG = 'subtitle-bilingual';
+ // Fixed M1 public bytes, not a value read from the editable release manifest.
+ export const M1_PUBLIC_FINGERPRINT = '70979b1ef42cf37cae7034124f813e18f3553e1378a92bdd2cca03538dbf3b55';
+-export const SITE_FILES = Object.freeze([...new Set([...PUBLIC_FILES, 'robots.txt', '_headers', 'sitemap.xml'])].sort());
++export const SITE_FILES = Object.freeze([...new Set([...PUBLIC_FILES, 'robots.txt', '_headers', 'sitemap.xml', '_redirects'])].sort());
++const legacyManifestSha256 = '7c0572463e122fe437d97d5f1d47381bbc53f4a30e1006f11fe0d8195c2ffc00';
+ const toolRoot = fileURLToPath(new URL('../', import.meta.url));
+ const fail = code => { throw Object.assign(new Error(code), { code }); };
+ const rowsFor = map => [...map.keys()].sort().map(path => ({ path, bytes: map.get(path).byteLength, sha256: sha256(map.get(path)) }));
+@@ -25,6 +26,29 @@ function fixedOrigin() {
+     url.pathname !== '/' || url.username || url.password || url.port || url.search || url.hash) fail('RELEASE_ORIGIN');
+ }
+ 
++// Fixed assets-only hosting contract. No environment, CLI or binding overrides.
++const hostingText = JSON.stringify({
++  name: 'glossquote-subtitle-bilingual', compatibility_date: '2026-10-24',
++  workers_dev: false, preview_urls: false, send_metrics: false,
++  observability: { enabled: false, logs: { enabled: false, invocation_logs: false }, traces: { enabled: false } },
++  routes: [{ pattern: 'bilingual-subs.glossquote.com', custom_domain: true }],
++  assets: { directory: './release-artifacts/site', run_worker_first: false, html_handling: 'none', not_found_handling: 'none' },
++  build: { command: 'npm run build:release' }
++}, null, 2) + '\n';
++
++export async function checkHostingConfig(root = toolRoot) {
++  const path = resolve(root, 'wrangler.jsonc');
++  let info;
++  try { info = await lstat(path); } catch { fail('RELEASE_HOSTING_CONFIG_MISSING'); }
++  if (info.isSymbolicLink() || !info.isFile()) fail('RELEASE_HOSTING_CONFIG_UNSAFE');
++  const actual = await readFile(path, 'utf8');
++  try { JSON.parse(actual); } catch { fail('RELEASE_HOSTING_CONFIG_JSON'); }
++  // Canonical JSON (a JSONC subset) also rejects duplicate keys, comments and hidden overrides.
++  if (actual !== hostingText) fail('RELEASE_HOSTING_CONFIG_MISMATCH');
++  return { name: 'glossquote-subtitle-bilingual', domain: 'bilingual-subs.glossquote.com',
++    assets: './release-artifacts/site', sha256: sha256(actual), runtime: 'assets-only', deployed: false };
++}
++
+ async function directory(path, optional = false) {
+   let stat;
+   try { stat = await lstat(path); }
+@@ -101,10 +125,30 @@ const HTML_CONTRACT = {
+     description: 'Match two SRT files by timeline, review ambiguous and unmatched cues, then download a bilingual SRT locally.' }
+ };
+ 
++function visibleReleaseText(html) {
++  const body = /<body>([\s\S]*?)<\/body>/i.exec(html);
++  if (!body) fail('RELEASE_HTML_BODY');
++  const text = body[1].replace(/<!--[\s\S]*?-->/g, '')
++    .replace(/<(script|style)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, '').replace(/<[^>]*>/g, ' ')
++    .replace(/&#(x[0-9a-f]+|[0-9]+);?/gi, (_, code) => {
++      const value = code[0].toLowerCase() === 'x' ? parseInt(code.slice(1), 16) : Number(code);
++      return value > 0 && value <= 0x10ffff ? String.fromCodePoint(value) : '\uFFFD';
++    }).replace(/&(nbsp|amp|lt|gt|quot|apos);/gi, (_, name) => ({ nbsp: ' ', amp: '&', lt: '<', gt: '>', quot: '"', apos: "'" })[name.toLowerCase()]);
++  return text.normalize('NFKC').replace(/[\u200b-\u200d\u2060\ufeff]/g, '').replace(/\s+/g, ' ');
++}
++
++function rejectStageCopy(html) {
++  const text = visibleReleaseText(html);
++  // Subtitle matching "候選/candidate" is real product terminology and remains allowed.
++  if (/(?:候選\s*(?:版|網站|頁面|工具|產物)|(?:尚未|未)\s*(?:正式\s*)?(?:發布|發佈|上線)|(?:瀏覽器|browser)\s*(?:尚未|未|not yet)\s*(?:驗證|verified|tested))/i.test(text) ||
++    /\b(?:release\s+candidate|unpublished|not\s+yet\s+(?:published|released|live)|preview[- ]only|candidate\s+(?:build|version|website|site)|not\s+(?:yet\s+)?browser[- ](?:verified|tested))\b/i.test(text)) fail('RELEASE_STAGE_COPY');
++}
++
+ export function auditReleaseHtml(bytes, path) {
+   const html = decoder.decode(bytes);
+   const expected = HTML_CONTRACT[path];
+   if (!expected) fail('RELEASE_HTML_PATH');
++  rejectStageCopy(html);
+   const range = headRange(html);
+   const insideHead = tag => tag.index >= range.start && tag.end <= range.end;
+   const roots = tags(html, 'html');
+@@ -119,12 +163,21 @@ export function auditReleaseHtml(bytes, path) {
+   if (robots.length !== 1 || robots[0].attrs.content !== 'index,follow' || !insideHead(robots[0]) ||
+     descriptions.length !== 1 || descriptions[0].attrs.content !== expected.description || !insideHead(descriptions[0])) fail('RELEASE_HTML_META');
+   const links = tags(html, 'link');
++  const scripts = tags(html, 'script');
++  const scriptBodies = [...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)];
++  const prefix = path === 'en/index.html' ? '../' : './';
++  const styles = links.filter(tag => tag.attrs.rel === 'stylesheet');
++  if (scripts.length !== 1 || scriptBodies.length !== 1 || scriptBodies[0][1].trim() ||
++    JSON.stringify(scripts[0].attrs) !== JSON.stringify({ type: 'module', src: `${prefix}js/app.js` }) ||
++    styles.length !== 1 || JSON.stringify(styles[0].attrs) !== JSON.stringify({ rel: 'stylesheet', href: `${prefix}css/app.css` }) ||
++    /\bdata-cf-beacon\s*=|\bon[a-z]+\s*=|<(?:iframe|object|embed|base|img|style)\b/i.test(html)) fail('RELEASE_HTML_ASSETS');
+   const canonical = links.filter(tag => tag.attrs.rel?.toLowerCase() === 'canonical');
+   const alternates = links.filter(tag => tag.attrs.rel?.toLowerCase() === 'alternate');
+   if (canonical.length !== 1 || canonical[0].attrs.href !== `${ORIGIN}/${path}` || !insideHead(canonical[0])) fail('RELEASE_HTML_CANONICAL');
+   const languagePages = { 'zh-Hant': 'index.html', en: 'en/index.html', 'x-default': 'index.html' };
+   if (alternates.length !== 3 || new Set(alternates.map(tag => tag.attrs.hreflang)).size !== 3 ||
+     alternates.some(tag => !insideHead(tag) || !Object.hasOwn(languagePages, tag.attrs.hreflang) || tag.attrs.href !== `${ORIGIN}/${languagePages[tag.attrs.hreflang]}`)) fail('RELEASE_HTML_ALTERNATES');
++  if (links.length !== 5) fail('RELEASE_HTML_ASSETS');
+   return { path, lang: roots[0].attrs.lang, canonical: canonical[0].attrs.href,
+     alternates: alternates.map(tag => ({ lang: tag.attrs.hreflang, href: tag.attrs.href })) };
+ }
+@@ -132,6 +185,7 @@ export function auditReleaseHtml(bytes, path) {
+ async function expectedRelease(root) {
+   if (Number(process.versions.node.split('.')[0]) !== 24) fail('NODE_24_REQUIRED');
+   fixedOrigin();
++  await checkHostingConfig(root);
+   const source = await sourceBytes(root);
+   const site = new Map(source.data);
+   for (const path of Object.keys(HTML_CONTRACT)) {
+@@ -141,14 +195,15 @@ async function expectedRelease(root) {
+   }
+   site.set('robots.txt', Buffer.from(`User-agent: *\nAllow: /\nSitemap: ${ORIGIN}/sitemap.xml\n`));
+   site.set('_headers', headersRelease(source.data.get('_headers')));
++  site.set('_redirects', Buffer.from('/ /index.html 301\n/en /en/index.html 301\n/en/ /en/index.html 301\n'));
+   site.set('sitemap.xml', Buffer.from(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>${ORIGIN}/index.html</loc></url>\n  <url><loc>${ORIGIN}/en/index.html</loc></url>\n</urlset>\n`));
+   const manifest = { schemaVersion: 1, mode: 'release-candidate', origin: ORIGIN, toolSlug: TOOL_SLUG,
+     files: rowsFor(site), sourceFiles: source.rows };
+   return { site, manifest, text: manifestText(manifest) };
+ }
+ 
+-async function inspectSite(siteRoot) {
+-  const allowedDirs = new Set(SITE_FILES.flatMap(path => {
++async function inspectSite(siteRoot, files) {
++  const allowedDirs = new Set(files.flatMap(path => {
+     const chunks = path.split('/'); return chunks.slice(0, -1).map((_, i) => chunks.slice(0, i + 1).join('/'));
+   }));
+   const found = [];
+@@ -163,40 +218,41 @@ async function inspectSite(siteRoot) {
+         if (!allowedDirs.has(relative)) fail('RELEASE_UNKNOWN_DIRECTORY');
+         await walk(target, relative);
+       } else {
+-        if (!stat.isFile() || !SITE_FILES.includes(relative)) fail('RELEASE_UNKNOWN_FILE');
++        if (!stat.isFile() || !files.includes(relative)) fail('RELEASE_UNKNOWN_FILE');
+         found.push(relative);
+       }
+     }
+   }
+   await walk(siteRoot);
+-  if (JSON.stringify(found.sort()) !== JSON.stringify(SITE_FILES)) fail('RELEASE_MISSING_FILE');
++  if (JSON.stringify(found.sort()) !== JSON.stringify(files)) fail('RELEASE_MISSING_FILE');
+ }
+ 
+-async function verifyOutput(root, expected) {
+-  const output = resolve(root, 'release-artifacts');
++async function verifyOutput(root, expected, output = resolve(root, 'release-artifacts')) {
+   await directory(output);
+   const entries = (await readdir(output)).sort();
+   if (JSON.stringify(entries) !== JSON.stringify(['manifest.json', 'site'])) fail('RELEASE_UNMANAGED_OUTPUT');
+   const manifestPath = resolve(output, 'manifest.json');
+   const info = await lstat(manifestPath);
+   if (info.isSymbolicLink() || !info.isFile()) fail('RELEASE_MANIFEST_UNSAFE');
+-  await inspectSite(resolve(output, 'site'));
++  const files = [...expected.site.keys()].sort();
++  await inspectSite(resolve(output, 'site'), files);
+   const actualText = await readFile(manifestPath, 'utf8');
+   let manifest;
+   try { manifest = JSON.parse(actualText); } catch { fail('RELEASE_MANIFEST_JSON'); }
+   if (manifest.schemaVersion !== 1 || manifest.mode !== 'release-candidate' || manifest.origin !== ORIGIN || manifest.toolSlug !== TOOL_SLUG ||
+     actualText !== expected.text) fail('RELEASE_MANIFEST_MISMATCH');
+-  for (const path of SITE_FILES) {
++  for (const path of files) {
+     const actual = await readFile(resolve(output, 'site', path));
+     if (Object.hasOwn(HTML_CONTRACT, path)) auditReleaseHtml(actual, path);
+     if (!actual.equals(expected.site.get(path))) fail('RELEASE_BYTES_MISMATCH');
+   }
+   // Catch a source change during generation/checking as well as one before it.
+   await sourceBytes(root);
++  const hosting = await checkHostingConfig(root);
+   return { status: 'PASS', mode: 'release-candidate', origin: ORIGIN, toolSlug: TOOL_SLUG,
+     sourceFiles: expected.manifest.sourceFiles.length, files: expected.manifest.files.length,
+     siteBytes: expected.manifest.files.reduce((sum, row) => sum + row.bytes, 0), manifestSha256: sha256(actualText),
+-    sourceFingerprint: M1_PUBLIC_FINGERPRINT, browser: 'NOT_RUN_USER_FOCUS_INCIDENT', published: false };
++    sourceFingerprint: M1_PUBLIC_FINGERPRINT, hosting, browser: 'NOT_RUN_BY_THIS_OFFLINE_COMMAND', published: false };
+ }
+ 
+ export async function checkRelease(root = toolRoot) {
+@@ -207,7 +263,41 @@ export async function checkRelease(root = toolRoot) {
+ export async function buildRelease(root = toolRoot) {
+   const expected = await expectedRelease(root);
+   const output = resolve(root, 'release-artifacts');
+-  if (await directory(output, true)) return { ...await verifyOutput(root, expected), reused: true };
++  if (await directory(output, true)) {
++    try { return { ...await verifyOutput(root, expected), reused: true }; }
++    catch (originalError) {
++      const path = resolve(output, 'manifest.json');
++      let previous;
++      try {
++        const stat = await lstat(path);
++        if (stat.isSymbolicLink() || !stat.isFile()) throw originalError;
++        previous = await readFile(path);
++      } catch { throw originalError; }
++      if (sha256(previous) !== legacyManifestSha256) throw originalError;
++      const site = new Map(expected.site); site.delete('_redirects');
++      const manifest = { ...expected.manifest, files: rowsFor(site) };
++      const legacy = { site, manifest, text: manifestText(manifest) };
++      if (sha256(legacy.text) !== legacyManifestSha256) fail('RELEASE_LEGACY_SOURCE_MISMATCH');
++      // Only the exact root-approved old package can be migrated; require its complete backup first.
++      await verifyOutput(root, legacy);
++      const backup = resolve(root, 'evidence/m2a/before/release-artifacts');
++      await verifyOutput(root, legacy, backup);
++      const handle = await open(path, 'r+');
++      try {
++        if (!(await handle.readFile()).equals(previous)) fail('RELEASE_LEGACY_MANIFEST_CHANGED');
++        await writeFile(resolve(output, 'site/_redirects'), expected.site.get('_redirects'), { flag: 'wx' });
++        const next = Buffer.from(expected.text);
++        for (let offset = 0; offset < next.length;) {
++          const { bytesWritten } = await handle.write(next, offset, next.length - offset, offset);
++          if (!bytesWritten) fail('RELEASE_MANIFEST_WRITE');
++          offset += bytesWritten;
++        }
++        await handle.truncate(next.length); await handle.sync();
++      } finally { await handle.close(); }
++      return { ...await verifyOutput(root, expected), reused: false, migrated: true,
++        previousManifestSha256: legacyManifestSha256, backup: 'evidence/m2a/before/release-artifacts' };
++    }
++  }
+   // All sources and any existing output have been checked before the first write.
+   // Exclusive creation prevents replacing a race-created file or unmanaged output.
+   await mkdir(output);
+warning: in the working copy of 'tool-projects/50-subtitle-bilingual/scripts/validate-m2a.mjs', LF will be replaced by CRLF the next time Git touches it
+diff --git a/evidence/m2a/before/EMPTY b/scripts/validate-m2a.mjs
+index e69de29..4729a40 100644
+--- a/evidence/m2a/before/EMPTY
++++ b/scripts/validate-m2a.mjs
+@@ -0,0 +1,46 @@
++import { readFile, writeFile, mkdir, access } from 'node:fs/promises';
++import { constants } from 'node:fs';
++import { spawnSync } from 'node:child_process';
++import { dirname, resolve } from 'node:path';
++import { fileURLToPath } from 'node:url';
++
++const root = fileURLToPath(new URL('../', import.meta.url));
++const evidence = resolve(root, 'evidence/m2a/final');
++const npmCli = resolve(dirname(process.execPath), 'node_modules/npm/bin/npm-cli.js');
++const steps = [
++  ['npm test', ['test'], 'npm-test-final.log'],
++  ['npm run check', ['run', 'check'], 'npm-check-final.log'],
++  ['npm run build:release', ['run', 'build:release'], 'npm-build-release-final.log'],
++  ['npm run check:release', ['run', 'check:release'], 'npm-check-release-final.log']
++];
++if (Number(process.versions.node.split('.')[0]) !== 24) throw new Error('NODE_24_REQUIRED');
++await access(npmCli, constants.R_OK); await mkdir(evidence, { recursive: true });
++for (const path of ['commands-final.json', ...steps.map(step => step[2])]) {
++  try { await access(resolve(evidence, path)); throw new Error('FINAL_EVIDENCE_ALREADY_EXISTS'); }
++  catch (error) { if (error.code !== 'ENOENT') throw error; }
++}
++const userConfig = resolve(evidence, 'npm-user.conf'), globalConfig = resolve(evidence, 'npm-global.conf');
++await writeFile(userConfig, '', { flag: 'wx' }); await writeFile(globalConfig, '', { flag: 'wx' });
++const flags = [`--userconfig=${userConfig}`, `--globalconfig=${globalConfig}`, `--cache=${resolve(evidence, 'npm-cache')}`,
++  '--logs-max=0', '--offline', '--audit=false', '--fund=false', '--update-notifier=false'];
++const records = [];
++for (const [command, args, log] of steps) {
++  const child = spawnSync(process.execPath, [npmCli, ...flags, ...args], {
++    cwd: root, shell: false, windowsHide: true, encoding: 'utf8', timeout: 60_000, maxBuffer: 4 * 1024 * 1024
++  });
++  await writeFile(resolve(evidence, log), (child.stdout ?? '') + (child.stderr ? `\n${child.stderr}` : ''), { flag: 'wx' });
++  records.push({ command, exit: child.status, signal: child.signal, error: child.error?.code ?? null, log });
++  console.log(JSON.stringify(records.at(-1))); if (child.status !== 0) break;
++}
++const text = await readFile(resolve(evidence, 'npm-test-final.log'), 'utf8'), counts = {};
++for (const label of ['tests', 'pass', 'fail', 'skipped']) {
++  const match = new RegExp(`(?:^|\\n)[^\\n]*?\\b${label} (\\d+)(?:\\r?\\n|$)`).exec(text);
++  if (match) counts[label] = Number(match[1]);
++}
++const result = { status: records.length === 4 && records.every(row => row.exit === 0) ? 'PASS' : 'FAIL',
++  node: process.version, commands: records, tests: counts,
++  npmInvocation: 'Existing npm-cli.js, offline, empty task-local user/global config, task-local cache; shell:false/windowsHide:true. No install.',
++  browser: 'NOT_RUN_BY_THIS_OFFLINE_COMMAND', publication: 'NOT_PUBLISHED', deployment: 'NOT_DEPLOYED' };
++await writeFile(resolve(evidence, 'commands-final.json'), JSON.stringify(result, null, 2) + '\n', { flag: 'wx' });
++console.log(JSON.stringify({ status: result.status, tests: counts }));
++if (result.status !== 'PASS') process.exitCode = 1;
+warning: in the working copy of 'tool-projects/50-subtitle-bilingual/evidence/m2a/before/TASK-ENTRY.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tool-projects/50-subtitle-bilingual/TASK-ENTRY.md', LF will be replaced by CRLF the next time Git touches it
+diff --git a/evidence/m2a/before/TASK-ENTRY.md b/TASK-ENTRY.md
+index 39e6ec3..5daadbc 100644
+--- a/evidence/m2a/before/TASK-ENTRY.md
++++ b/TASK-ENTRY.md
+@@ -34,3 +34,21 @@ M1 最終驗證：Node v24.14.0，`node --test` exit 0（81/81）、check exit 0
+ M1B 最終命令（一次完整 suite）：npm test exit 0，112 tests/112 pass/0 fail/0 skipped；npm run check、build:release、check:release 均 exit 0。site 17 檔/81,590 bytes，manifest SHA-256 `7c0572463e122fe437d97d5f1d47381bbc53f4a30e1006f11fe0d8195c2ffc00`。全部 Environment Snapshots 前後相等。原預覽 build 命令未重跑；既有 build 函式只由原工具鏈測試作用於 m1b 的合成 copy，不寫真 dist。
+ 
+ 本輪沒有未解的實作阻擋或必須由主代理選擇的產品分歧。仍需主代理回收獨立驗證、補真實瀏覽器 gates 並另行決定 M2；停在 M1B，不公開、不部署、不輪詢或另開對話。
++
++## B20-50-M2A（2026-10-27）
++
++root 已有真 browser r1：32 PASS/6 NOT_RUN/0 FAIL，prohibited 空、parent cleanup PASS；本輪僅本地發布準備，不 rerun browser，也不是 M2B 放行。六個 NOT_RUN 的既有範圍不變。已讀根/工具 AGENTS、規格/HANDOFF，沿用原對話 Sol/max 要求，backend 未自證；無再委派。
++
++初始 baseline 共 140 檔。舊 release-artifacts 18 檔完整保存於 evidence/m2a/before/release-artifacts 並核 SHA；兩語頁沒有未發布標語，不修改 release transformation 的輸出。public/dist/runtime、舊 evidence、M1B 文件及所有既有包不改。
++
++新增固定 wrangler.jsonc，僅此工具 custom domain、assets-only，日期2026-10-24，開發/preview/metrics/observability/logs/invocation logs/traces 全 false，HTML/fallback none，build 使用既有 build:release。release/check 嚴拒設定漂移、analytics 和候選未發布文案；runtime 及頁面 bytes 不變。
++
++41 個新增發布測試與舊31項合計72/72通過。最終完整 suite/check/build:release/check:release 由 scripts/validate-m2a.mjs 保存新收據；測試合成檔與暫存全導向 m2a。完成後 scripts/record-m2a.mjs 會核對 protected baseline/舊release backup，產生 source-set、artifact-set、config 與 manifest hashes。沒有執行舊 freeze/record/validate-m1b，避免寫歷史證據。
++
++本輪採 workers-best-practices 作設定核對；使用者的固定日期與關閉 telemetry 明確優先於技能建議。只讀官方配置文件，未使用 Wrangler CLI、服務、憑證或 Cloudflare API。停在 M2A，待 root 審查後另行放行 M2B。
++
++root 追加 M2A 入口規則：維持 html_handling:none，release 新增三行固定 _redirects（/、/en、/en/ 到 matching index.html，301，真 LF），manifest 必須覆蓋。上一段「輸出不變」指追加前設定階段；最終只改 manifest 並加 _redirects，其餘原17個site檔仍逐byte不變，舊18檔備份保留。
++
++追加前完整153/153及check/buildrelease/checkrelease已通過且證據保留 evidence/m2a/ 根層。含轉址的最終檢查改寫新的 evidence/m2a/final，不覆蓋先前收據。受控升級只限已知 7c057… 舊 manifest 與完整同版 backup 全驗證成功；改過的產物或 backup、缺少backup皆拒絕。未重跑已通過的瀏覽器案例，50站真實入口301尚待 root M2B/部署時驗證。
++
++M2A 最終：release 81/81、完整 npm test 162/162，check/build:release/check:release 全 exit0。實際 migrated=true；18個site檔81,655 bytes，新增_redirects65 bytes；新manifest9e3564dd4acbe8f89ed8f579a8964d8a7d15c84983c6145a86c964a7e116cbce。原17個site檔及CSP不變、舊18檔backup完整；全階段Environment Snapshots相等。資料只交root，無M2B/push/deploy/新ZIP。
+warning: in the working copy of 'tool-projects/50-subtitle-bilingual/evidence/m2a/before/test/merge.test.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tool-projects/50-subtitle-bilingual/test/merge.test.mjs', LF will be replaced by CRLF the next time Git touches it
+diff --git a/evidence/m2a/before/test/merge.test.mjs b/test/merge.test.mjs
+index 82ca248..1a549d5 100644
+--- a/evidence/m2a/before/test/merge.test.mjs
++++ b/test/merge.test.mjs
+@@ -41,7 +41,7 @@ test('AC07/16 actual artifact bytes match an independently written SRT oracle',
+   const actual = bytes(serializeSrt(result.outputCues));
+   assert.deepEqual(new Uint8Array(actual), new Uint8Array(bytes(EXPECTED)));
+   assert.notEqual(new Uint8Array(actual)[0], 0xef);
+-  const directory = new URL('../evidence/m1b/oracle/', import.meta.url);
++  const directory = new URL('../evidence/m2a/oracle/', import.meta.url);
+   await mkdir(directory, { recursive: true });
+   await writeFile(new URL('main.synthetic.srt', directory), new Uint8Array(bytes(MAIN)));
+   await writeFile(new URL('secondary.synthetic.srt', directory), new Uint8Array(bytes(SECONDARY)));
+warning: in the working copy of 'tool-projects/50-subtitle-bilingual/evidence/m2a/before/test/release.test.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tool-projects/50-subtitle-bilingual/test/release.test.mjs', LF will be replaced by CRLF the next time Git touches it
+diff --git a/evidence/m2a/before/test/release.test.mjs b/test/release.test.mjs
+index 3cc8786..a95d9dc 100644
+--- a/evidence/m2a/before/test/release.test.mjs
++++ b/test/release.test.mjs
+@@ -5,11 +5,11 @@ import { resolve, join } from 'node:path';
+ import { fileURLToPath } from 'node:url';
+ import { spawnSync } from 'node:child_process';
+ import { createHash } from 'node:crypto';
+-import { buildRelease, checkRelease, auditReleaseHtml, releaseMode, ORIGIN, TOOL_SLUG, M1_PUBLIC_FINGERPRINT } from '../scripts/release.mjs';
++import { buildRelease, checkRelease, auditReleaseHtml, checkHostingConfig, releaseMode, ORIGIN, TOOL_SLUG, M1_PUBLIC_FINGERPRINT } from '../scripts/release.mjs';
+ import { PUBLIC_FILES, inside, snapshot } from '../scripts/files.mjs';
+ 
+ const root = fileURLToPath(new URL('../', import.meta.url));
+-const fixtures = resolve(root, 'evidence/m1b/test-workspaces');
++const fixtures = resolve(root, 'evidence/m2a/test-workspaces');
+ const EXPECTED_ORIGIN = 'https://bilingual-subs.glossquote.com';
+ const digest = bytes => createHash('sha256').update(bytes).digest('hex');
+ 
+@@ -30,6 +30,7 @@ async function workspace(action, { built = true } = {}) {
+   const directory = await mkdtemp(join(fixtures, 'release-synthetic-'));
+   try {
+     await cp(resolve(root, 'public'), join(directory, 'public'), { recursive: true });
++    await cp(resolve(root, 'wrangler.jsonc'), join(directory, 'wrangler.jsonc'));
+     if (built) await buildRelease(directory);
+     return await action(directory);
+   } finally {
+@@ -88,9 +89,9 @@ test('RP03–07 real files: head-only bilingual SEO, exact robots/sitemap/securi
+   assert.deepEqual(Object.keys(manifest), ['schemaVersion', 'mode', 'origin', 'toolSlug', 'files', 'sourceFiles']);
+   assert.equal(manifest.schemaVersion, 1); assert.equal(manifest.mode, 'release-candidate');
+   assert.equal(manifest.origin, EXPECTED_ORIGIN); assert.equal(manifest.toolSlug, 'subtitle-bilingual');
+-  assert.equal(manifest.files.length, 17); assert.deepEqual(manifest.sourceFiles, original);
+-  assert.deepEqual(manifest.files.map(row => row.path), [...PUBLIC_FILES, 'sitemap.xml'].sort());
+-  assert.equal(new Set(manifest.files.map(row => row.path)).size, 17);
++  assert.equal(manifest.files.length, 18); assert.deepEqual(manifest.sourceFiles, original);
++  assert.deepEqual(manifest.files.map(row => row.path), [...PUBLIC_FILES, 'sitemap.xml', '_redirects'].sort());
++  assert.equal(new Set(manifest.files.map(row => row.path)).size, 18);
+   assert.doesNotMatch(manifestBytes.toString(), /[A-Z]:\\|createdAt|timestamp|lastmod|\.\.\//);
+   for (const path of PUBLIC_FILES.filter(path => !['index.html', 'en/index.html', '_headers', 'robots.txt'].includes(path))) {
+     assert.deepEqual(await readFile(join(output, path)), await readFile(join(directory, 'public', path)));
+@@ -117,6 +118,8 @@ test('RP03–07 real files: head-only bilingual SEO, exact robots/sitemap/securi
+     assert.doesNotMatch(preview, /rel="canonical"|hreflang="x-default"/);
+   }
+   assert.equal(await readFile(join(output, 'robots.txt'), 'utf8'), 'User-agent: *\nAllow: /\nSitemap: https://bilingual-subs.glossquote.com/sitemap.xml\n');
++  assert.equal(await readFile(join(output, '_redirects'), 'utf8'), '/ /index.html 301\n/en /en/index.html 301\n/en/ /en/index.html 301\n');
++  assert.deepEqual((await readFile(join(output, '_redirects'), 'utf8')).trimEnd().split('\n'), ['/ /index.html 301', '/en /en/index.html 301', '/en/ /en/index.html 301']);
+   const sitemap = await readFile(join(output, 'sitemap.xml'), 'utf8');
+   assert.deepEqual([...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(match => match[1]), [
+     'https://bilingual-subs.glossquote.com/index.html', 'https://bilingual-subs.glossquote.com/en/index.html'
+@@ -139,7 +142,7 @@ test('RP03/08 identical rebuild reuses bytes and deterministic manifest without
+   assert.equal((await buildRelease(directory)).reused, true);
+   assert.deepEqual(await inventory(join(directory, 'release-artifacts')), before);
+   assert.equal((await lstat(manifestPath)).mtimeMs, stat.mtimeMs);
+-  assert.equal((await checkRelease(directory)).files, 17);
++  assert.equal((await checkRelease(directory)).files, 18);
+ }));
+ 
+ test('RP03 check with missing release does not create files', async () => workspace(async directory => {
+@@ -226,3 +229,150 @@ for (const scope of ['source-js', 'site', 'release-root']) {
+     await rejectedWithoutWrite(directory, /LINK_|RELEASE_DIRECTORY_UNSAFE|RELEASE_LINK/);
+   }));
+ }
++
++test('M2A exact assets-only domain/config with telemetry disabled and fixed build command', async () => {
++  const raw = await readFile(join(root, 'wrangler.jsonc'), 'utf8'), config = JSON.parse(raw);
++  assert.deepEqual(config, {
++    name: 'glossquote-subtitle-bilingual', compatibility_date: '2026-10-24',
++    workers_dev: false, preview_urls: false, send_metrics: false,
++    observability: { enabled: false, logs: { enabled: false, invocation_logs: false }, traces: { enabled: false } },
++    routes: [{ pattern: 'bilingual-subs.glossquote.com', custom_domain: true }],
++    assets: { directory: './release-artifacts/site', run_worker_first: false, html_handling: 'none', not_found_handling: 'none' },
++    build: { command: 'npm run build:release' }
++  });
++  assert.equal((await checkHostingConfig(root)).sha256, digest(Buffer.from(raw)));
++  assert.equal('main' in config, false); assert.equal('vars' in config, false); assert.equal('analytics_engine_datasets' in config, false);
++});
++
++for (const [name, change] of [
++  ['worker name', value => { value.name = 'wrong-worker'; }],
++  ['compatibility date', value => { value.compatibility_date = '2026-10-27'; }],
++  ['workers.dev enabled', value => { value.workers_dev = true; }],
++  ['preview URLs enabled', value => { value.preview_urls = true; }],
++  ['metrics enabled', value => { value.send_metrics = true; }],
++  ['observability enabled', value => { value.observability.enabled = true; }],
++  ['logs enabled', value => { value.observability.logs.enabled = true; }],
++  ['invocation logs enabled', value => { value.observability.logs.invocation_logs = true; }],
++  ['traces enabled', value => { value.observability.traces.enabled = true; }],
++  ['wrong domain', value => { value.routes[0].pattern = 'date.glossquote.com'; }],
++  ['domain with wildcard path', value => { value.routes[0].pattern = 'bilingual-subs.glossquote.com/*'; }],
++  ['custom domain disabled', value => { value.routes[0].custom_domain = false; }],
++  ['extra route', value => { value.routes.push({ pattern: '040141.xyz', custom_domain: true }); }],
++  ['preview assets path', value => { value.assets.directory = './public'; }],
++  ['path traversal', value => { value.assets.directory = '../outside'; }],
++  ['runtime before assets', value => { value.assets.run_worker_first = true; }],
++  ['HTML rewriting', value => { value.assets.html_handling = 'auto-trailing-slash'; }],
++  ['SPA fallback', value => { value.assets.not_found_handling = 'single-page-application'; }],
++  ['deploy instead of build', value => { value.build.command = 'wrangler deploy'; }],
++  ['extra runtime entry', value => { value.main = 'src/worker.js'; }],
++  ['analytics binding', value => { value.analytics_engine_datasets = [{ binding: 'TRACKING' }]; }],
++  ['storage binding', value => { value.kv_namespaces = [{ binding: 'DATA', id: 'synthetic' }]; }],
++  ['environment override', value => { value.env = { production: { workers_dev: true } }; }]
++]) test(`M2A rejects ${name} before writing any output`, async () => workspace(async directory => {
++  const path = join(directory, 'wrangler.jsonc'), config = JSON.parse(await readFile(path, 'utf8'));
++  change(config); await writeFile(path, JSON.stringify(config, null, 2) + '\n');
++  await assert.rejects(() => checkHostingConfig(directory), /RELEASE_HOSTING_CONFIG_MISMATCH/);
++  await rejectedWithoutWrite(directory, /RELEASE_HOSTING_CONFIG_MISMATCH/);
++}));
++
++test('M2A rejects duplicate JSON keys even when the last value is the allowed value', async () => workspace(async directory => {
++  const path = join(directory, 'wrangler.jsonc'), raw = await readFile(path, 'utf8');
++  await writeFile(path, raw.replace('"send_metrics": false,', '"send_metrics": true,\n  "send_metrics": false,'));
++  await rejectedWithoutWrite(directory, /RELEASE_HOSTING_CONFIG_MISMATCH/);
++}));
++test('M2A missing hosting file is not adopted or written automatically', async () => workspace(async directory => {
++  await rm(join(directory, 'wrangler.jsonc')); await rejectedWithoutWrite(directory, /RELEASE_HOSTING_CONFIG_MISSING/);
++}));
++test('M2A directory in place of hosting config is rejected', async () => workspace(async directory => {
++  const path = join(directory, 'wrangler.jsonc'); await rm(path); await mkdir(path);
++  await rejectedWithoutWrite(directory, /RELEASE_HOSTING_CONFIG_UNSAFE/);
++}));
++
++for (const [path, slogans] of [
++  ['index.html', ['候選版，尚未發布', '尚未正式上線', '瀏覽器尚未驗證', '尚未&#x767c;布']],
++  ['en/index.html', ['Release candidate', 'Not yet published', 'Not browser-verified', 'Not yet &#112;ublished']]
++]) for (const slogan of slogans) test(`M2A rejects release-stage copy ${path}: ${slogan}`, async () => workspace(async directory => {
++  const bytes = Buffer.from((await readFile(join(directory, 'release-artifacts/site', path), 'utf8')).replace('<body>', `<body>\n<p>${slogan}</p>`));
++  assert.throws(() => auditReleaseHtml(bytes, path), /RELEASE_STAGE_COPY/);
++  await writeFile(join(directory, 'release-artifacts/site', path), bytes); await forgedManifest(directory, path, bytes);
++  await rejectedWithoutWrite(directory);
++}));
++
++for (const path of ['index.html', 'en/index.html']) for (const [name, injected] of [
++  ['external analytics', '<script src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon="synthetic"></script>'],
++  ['inline analytics', '<script>globalThis.syntheticAnalytics = true</script>'],
++  ['remote stylesheet', '<link rel="stylesheet" href="https://evil.invalid/tracker.css">']
++]) test(`M2A rejects ${name} in ${path} without executing it`, async () => workspace(async directory => {
++  const bytes = Buffer.from((await readFile(join(directory, 'release-artifacts/site', path), 'utf8')).replace('</head>', `${injected}\n</head>`));
++  assert.throws(() => auditReleaseHtml(bytes, path), /RELEASE_HTML_ASSETS/);
++  await writeFile(join(directory, 'release-artifacts/site', path), bytes); await forgedManifest(directory, path, bytes);
++  await rejectedWithoutWrite(directory);
++}));
++
++for (const [name, text] of [
++  ['302 status', '/ /index.html 302\n/en /en/index.html 301\n/en/ /en/index.html 301\n'],
++  ['external target', '/ https://evil.invalid/index.html 301\n/en /en/index.html 301\n/en/ /en/index.html 301\n'],
++  ['missing en rules', '/ /index.html 301\n'],
++  ['literal backslash n', '/ /index.html 301\\n/en /en/index.html 301\\n/en/ /en/index.html 301\\n'],
++  ['extra rule', '/ /index.html 301\n/en /en/index.html 301\n/en/ /en/index.html 301\n/private /index.html 301\n']
++]) test(`M2A rejects redirect ${name}, including a forged matching manifest row`, async () => workspace(async directory => {
++  const bytes = Buffer.from(text), path = '_redirects';
++  await writeFile(join(directory, 'release-artifacts/site', path), bytes); await forgedManifest(directory, path, bytes);
++  await rejectedWithoutWrite(directory);
++}));
++
++// Independent reconstruction of the already-frozen M1B fixture. The known SHA is the oracle.
++// No production build/check function is used to generate this previous-version input.
++async function previousRelease(directory) {
++  const output = join(directory, 'release-artifacts'), site = join(output, 'site');
++  await mkdir(site, { recursive: true });
++  const paths = [...PUBLIC_FILES, 'sitemap.xml'].sort();
++  for (const path of paths) {
++    let bytes;
++    if (path === 'sitemap.xml') bytes = Buffer.from('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>https://bilingual-subs.glossquote.com/index.html</loc></url>\n  <url><loc>https://bilingual-subs.glossquote.com/en/index.html</loc></url>\n</urlset>\n');
++    else {
++      bytes = await readFile(join(directory, 'public', path));
++      if (path.endsWith('.html')) {
++        const links = `  <link rel="canonical" href="https://bilingual-subs.glossquote.com/${path}">\n` +
++          '  <link rel="alternate" hreflang="zh-Hant" href="https://bilingual-subs.glossquote.com/index.html">\n' +
++          '  <link rel="alternate" hreflang="en" href="https://bilingual-subs.glossquote.com/en/index.html">\n' +
++          '  <link rel="alternate" hreflang="x-default" href="https://bilingual-subs.glossquote.com/index.html">\n';
++        bytes = Buffer.from(bytes.toString().replace('content="noindex,nofollow,noarchive"', 'content="index,follow"').replace('</head>', `${links}</head>`));
++      } else if (path === '_headers') bytes = Buffer.from(bytes.toString().replace('X-Robots-Tag: noindex, nofollow, noarchive', 'X-Robots-Tag: index, follow'));
++      else if (path === 'robots.txt') bytes = Buffer.from('User-agent: *\nAllow: /\nSitemap: https://bilingual-subs.glossquote.com/sitemap.xml\n');
++    }
++    const target = join(site, path); await mkdir(resolve(target, '..'), { recursive: true }); await writeFile(target, bytes, { flag: 'wx' });
++  }
++  const rows = await Promise.all(paths.map(async path => { const bytes = await readFile(join(site, path)); return { path, bytes: bytes.length, sha256: digest(bytes) }; }));
++  const text = JSON.stringify({ schemaVersion: 1, mode: 'release-candidate', origin: 'https://bilingual-subs.glossquote.com',
++    toolSlug: 'subtitle-bilingual', files: rows, sourceFiles: await snapshot(join(directory, 'public')) }, null, 2) + '\n';
++  assert.equal(digest(Buffer.from(text)), '7c0572463e122fe437d97d5f1d47381bbc53f4a30e1006f11fe0d8195c2ffc00');
++  await writeFile(join(output, 'manifest.json'), text, { flag: 'wx' });
++}
++async function backUpPrevious(directory) {
++  const parent = join(directory, 'evidence/m2a/before'); await mkdir(parent, { recursive: true });
++  await cp(join(directory, 'release-artifacts'), join(parent, 'release-artifacts'), { recursive: true });
++  return join(parent, 'release-artifacts');
++}
++test('M2A exact previous version migrates only after full backup verification, preserving all 17 old site files', async () => workspace(async directory => {
++  await previousRelease(directory); const backup = await backUpPrevious(directory);
++  const beforeSite = await inventory(join(directory, 'release-artifacts/site')), beforeBackup = await inventory(backup);
++  const result = await buildRelease(directory);
++  assert.equal(result.migrated, true); assert.equal(result.files, 18);
++  assert.equal(result.previousManifestSha256, '7c0572463e122fe437d97d5f1d47381bbc53f4a30e1006f11fe0d8195c2ffc00');
++  assert.deepEqual((await inventory(join(directory, 'release-artifacts/site'))).filter(row => row.path !== '_redirects'), beforeSite);
++  assert.deepEqual(await inventory(backup), beforeBackup);
++  assert.equal((await buildRelease(directory)).reused, true);
++}, { built: false }));
++test('M2A previous version without a complete backup refuses upgrade without writes', async () => workspace(async directory => {
++  await previousRelease(directory); await rejectedWithoutWrite(directory);
++}, { built: false }));
++test('M2A modified old artifact refuses upgrade and never overwrites it', async () => workspace(async directory => {
++  await previousRelease(directory); await backUpPrevious(directory);
++  await writeFile(join(directory, 'release-artifacts/site/js/app.js'), 'synthetic preserve modified artifact');
++  await rejectedWithoutWrite(directory);
++}, { built: false }));
++test('M2A modified backup refuses upgrade and remains untouched', async () => workspace(async directory => {
++  await previousRelease(directory); const backup = await backUpPrevious(directory);
++  await writeFile(join(backup, 'site/js/app.js'), 'synthetic preserve modified backup'); await rejectedWithoutWrite(directory);
++}, { built: false }));
+warning: in the working copy of 'tool-projects/50-subtitle-bilingual/evidence/m2a/before/test/toolchain.test.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tool-projects/50-subtitle-bilingual/test/toolchain.test.mjs', LF will be replaced by CRLF the next time Git touches it
+diff --git a/evidence/m2a/before/test/toolchain.test.mjs b/test/toolchain.test.mjs
+index 8cfc080..c5f0bc7 100644
+--- a/evidence/m2a/before/test/toolchain.test.mjs
++++ b/test/toolchain.test.mjs
+@@ -10,7 +10,7 @@ import { handleRequest } from '../scripts/serve.mjs';
+ import { copy } from '../public/js/i18n.js';
+ 
+ const root = fileURLToPath(new URL('../', import.meta.url));
+-const fixtureRoot = resolve(root, 'evidence/m1b/test-workspaces');
++const fixtureRoot = resolve(root, 'evidence/m2a/test-workspaces');
+ async function workspace(action) {
+   await mkdir(fixtureRoot, { recursive: true });
+   const directory = await mkdtemp(join(fixtureRoot, 'synthetic-'));
+warning: in the working copy of 'tool-projects/50-subtitle-bilingual/wrangler.jsonc', LF will be replaced by CRLF the next time Git touches it
+diff --git a/evidence/m2a/before/EMPTY b/wrangler.jsonc
+index e69de29..24f6f5d 100644
+--- a/evidence/m2a/before/EMPTY
++++ b/wrangler.jsonc
+@@ -0,0 +1,32 @@
++{
++  "name": "glossquote-subtitle-bilingual",
++  "compatibility_date": "2026-10-24",
++  "workers_dev": false,
++  "preview_urls": false,
++  "send_metrics": false,
++  "observability": {
++    "enabled": false,
++    "logs": {
++      "enabled": false,
++      "invocation_logs": false
++    },
++    "traces": {
++      "enabled": false
++    }
++  },
++  "routes": [
++    {
++      "pattern": "bilingual-subs.glossquote.com",
++      "custom_domain": true
++    }
++  ],
++  "assets": {
++    "directory": "./release-artifacts/site",
++    "run_worker_first": false,
++    "html_handling": "none",
++    "not_found_handling": "none"
++  },
++  "build": {
++    "command": "npm run build:release"
++  }
++}

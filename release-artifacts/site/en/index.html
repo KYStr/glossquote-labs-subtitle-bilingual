@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="index,follow">
+  <meta name="description" content="Match two SRT files by timeline, review ambiguous and unmatched cues, then download a bilingual SRT locally.">
+  <title>Merge Bilingual Subtitles | Gloss Tools</title>
+  <link rel="stylesheet" href="../css/app.css">
+  <script type="module" src="../js/app.js"></script>
+  <link rel="canonical" href="https://bilingual-subs.glossquote.com/en/index.html">
+  <link rel="alternate" hreflang="zh-Hant" href="https://bilingual-subs.glossquote.com/index.html">
+  <link rel="alternate" hreflang="en" href="https://bilingual-subs.glossquote.com/en/index.html">
+  <link rel="alternate" hreflang="x-default" href="https://bilingual-subs.glossquote.com/index.html">
+</head>
+<body>
+  <a class="skip" href="#workspace">Skip to subtitle workspace</a>
+  <header class="topbar">
+    <a href="https://glossquote.com/en/index.html">Gloss Tools</a>
+    <span>Bilingual subtitles</span>
+    <nav aria-label="Language"><a href="../index.html" aria-describedby="language-warning" lang="zh-Hant" hreflang="zh-Hant">繁中</a> <span aria-current="page">English</span></nav>
+  </header>
+  <main id="workspace">
+    <p id="language-warning" class="language-warning">Switching language leaves this page. Subtitles and results you have not exported will be lost.</p>
+    <h1>Merge two SRT files into bilingual subtitles</h1>
+    <p class="intro">Choose the main timeline and match two languages by time overlap. Review ambiguity before downloading; unmatched cues stay in the output by default.</p>
+    <section class="sources" aria-labelledby="sources-title">
+      <h2 id="sources-title">Two source subtitle files</h2>
+      <p id="file-help">UTF-8 SRT only; up to 1,048,576 bytes and 3,000 cues per file. Sources stay unchanged; content is processed in this page’s memory.</p>
+      <div class="file-grid">
+        <div class="field">
+          <label for="main-file">Main SRT (sets the matched timeline)</label>
+          <input type="file" id="main-file" accept=".srt,application/x-subrip,text/plain" aria-describedby="file-help main-meta main-error">
+          <p id="main-meta">No file selected</p><p id="main-error" class="error"></p>
+        </div>
+        <div class="field">
+          <label for="secondary-file">Secondary SRT (appears below the main text)</label>
+          <input type="file" id="secondary-file" accept=".srt,application/x-subrip,text/plain" aria-describedby="file-help secondary-meta secondary-error">
+          <p id="secondary-meta">No file selected</p><p id="secondary-error" class="error"></p>
+        </div>
+      </div>
+      <div class="actions">
+        <button type="button" id="start" class="primary" disabled>Start matching</button>
+        <button type="button" id="cancel" disabled>Cancel job</button>
+        <button type="button" id="swap" disabled>Swap main and secondary</button>
+        <button type="button" id="clear">Clear everything</button>
+      </div>
+      <p id="status" role="status" aria-live="polite">Choose two UTF-8 SRT files, set the main and secondary tracks, then start.</p>
+      <p id="job-error" class="error" role="alert"></p>
+    </section>
+    <section class="summary" aria-labelledby="summary-title">
+      <h2 id="summary-title">Matching summary</h2>
+      <p id="summary">After matching, every source cue and its status appears here.</p>
+    </section>
+    <div class="worksheet">
+      <section aria-labelledby="review-title" class="review-pane">
+        <h2 id="review-title">Review and pair cues</h2>
+        <p>Automatic pairs need a unique mutual best and at least 1/2 IoU. Manual choices stay fixed; replacing automatic pairs or pairing below the threshold requires confirmation.</p>
+        <section aria-labelledby="main-review-title"><h3 id="main-review-title">Main subtitles</h3><div id="main-cues"></div></section>
+        <section aria-labelledby="secondary-review-title"><h3 id="secondary-review-title">Secondary subtitles</h3><div id="secondary-cues"></div></section>
+        <section id="candidate-panel" class="candidate-panel" aria-labelledby="candidate-title" hidden>
+          <h3 id="candidate-title">Choose a cue from the other track</h3>
+          <p id="candidate-source" class="cue-text"></p>
+          <p id="candidate-help">Sorted by exact IoU, then source cue number. Choices below 1/2 require confirmation.</p>
+          <label for="candidate-select">Partner and timeline overlap ratio</label>
+          <select id="candidate-select" aria-describedby="candidate-help candidate-text"></select>
+          <p id="candidate-text" class="cue-text"></p>
+          <div class="actions"><button type="button" id="apply-pair">Pair these cues</button><button type="button" id="close-candidates">Close candidates</button></div>
+        </section>
+      </section>
+      <section aria-labelledby="preview-title" class="preview-pane">
+        <h2 id="preview-title">Main timeline output preview</h2>
+        <p>Paired cues use the main timing, with main text above secondary text. Standalone cues keep their own timing; output is sorted by start time.</p>
+        <div id="preview"><p class="empty-state">The actual output appears here after matching and resolving every ambiguity.</p></div>
+      </section>
+    </div>
+    <section class="download" aria-labelledby="download-title">
+      <h2 id="download-title">Download subtitles</h2>
+      <p id="output-count"></p>
+      <button type="button" id="download" disabled>Download bilingual SRT</button>
+      <p>Filename: bilingual-subtitles.srt; UTF-8 without a BOM. Results do not expire automatically. Changing sources, swapping, clearing, or leaving the page clears this job.</p>
+    </section>
+    <section class="help" aria-labelledby="faq-title">
+      <h2 id="faq-title">Before and after merging</h2>
+      <details><summary>Does it translate subtitles?</summary><p>No. It only matches two existing subtitle files by time.</p></details>
+      <details><summary>When are cues matched automatically?</summary><p>Only when timeline IoU is at least 0.5 and each cue has a unique mutual best match.</p></details>
+      <details><summary>Can I download while matches are ambiguous?</summary><p>No. Pair each ambiguous cue or explicitly keep it separate before an output is created. If a candidate replaces an automatic pair, the confirmation names that pair; canceling preserves the existing result.</p></details>
+      <details><summary>Can I manually pair cues below 0.5 IoU?</summary><p>Yes, after reviewing the exact ratio and warning. Canceling leaves existing matches unchanged.</p></details>
+      <details><summary>Can I keep an automatic match as separate cues?</summary><p>Yes. The confirmation names the released cue; canceling keeps the original match.</p></details>
+      <details><summary>Are unmatched cues discarded?</summary><p>No. They stay in the output by default; excluding one requires an explicit choice and confirmation. Excluded cues can be restored.</p></details>
+      <details><summary>Which subtitle files are supported?</summary><p>This release defines a strict UTF-8 SRT profile and does not claim support for every SRT variant or player. It accepts LF, CRLF, CR, and one BOM; cue numbers start at 1 consecutively, timecodes have no extra settings, and each cue has nonblank text.</p></details>
+      <details><summary>What if too many subtitle cues overlap?</summary><p>More than 50,000 eligible candidate pairs stops the whole job with a clear prompt to shorten the subtitle segments; no partial result is offered.</p></details>
+      <details><summary>Are my files uploaded?</summary><p>No. Files are processed in local memory without upload, AI, or conversion. Switching language loses the current job. Downloaded files remain under your browser’s and operating system’s control.</p></details>
+    </section>
+    <noscript>This tool needs JavaScript to parse and merge local subtitles. Enable JavaScript and try again.</noscript>
+  </main>
+  <dialog id="confirmation" aria-labelledby="confirmation-title" aria-describedby="confirmation-body">
+    <h2 id="confirmation-title">Confirm this change</h2><div id="confirmation-body"></div>
+    <div class="actions"><button type="button" id="confirm-no" autofocus>Cancel; keep current result</button><button type="button" id="confirm-yes" class="primary">Confirm change</button></div>
+  </dialog>
+  <footer>Gloss Tools by GlossQuote · Local subtitle worksheet · <a href="https://glossquote.com/en/index.html">Back to all tools</a></footer>
+</body>
+</html>

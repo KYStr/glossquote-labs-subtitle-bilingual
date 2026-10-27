@@ -1,0 +1,8 @@
+{
+  "Status": "FAIL",
+  "CompleteSnapshotsEqual": true,
+  "GuardExit": null,
+  "Before": "environment-before.json",
+  "After": "environment-after.json",
+  "Comparison": "Entire Snapshots including PATH hash/type/length/ephemeral arrays and Environment-key fingerprints/TEMP/TMP"
+}

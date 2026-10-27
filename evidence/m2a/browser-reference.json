@@ -1,0 +1,40 @@
+{
+  "run": ".runs/batch20-browser-release-2026-10-25/isolated/b20-50-r1",
+  "browserVersion": "145.0.7632.6",
+  "pass": 32,
+  "notRun": 6,
+  "fail": 0,
+  "failures": 0,
+  "retainedNotRun": [
+    {
+      "id": "B50-13-delayed-private-events",
+      "language": "zh-Hant"
+    },
+    {
+      "id": "B50-17-200-percent-text-zoom",
+      "language": "zh-Hant"
+    },
+    {
+      "id": "B50-19-native-and-AT",
+      "language": "zh-Hant"
+    },
+    {
+      "id": "B50-13-delayed-private-events",
+      "language": "en"
+    },
+    {
+      "id": "B50-17-200-percent-text-zoom",
+      "language": "en"
+    },
+    {
+      "id": "B50-19-native-and-AT",
+      "language": "en"
+    }
+  ],
+  "parentCleanup": "PASS",
+  "resultSha256": "90cb3aa20fbbb861add3b641dc57cac9f0186eec0bee6aca21967086b87ceac5",
+  "parentCleanupSha256": "f6d57456c945e5e15ed026271dc4d4e9b1612e50355627e26ec3c31dc7e80f33",
+  "source": "Historical root execution, not rerun by M2A",
+  "rootStatement": "Prohibited actions empty; root inspected 320px success image, per M2A dispatch",
+  "prohibited": []
+}

@@ -1,0 +1,9 @@
+{
+  "Status": "PASS",
+  "SourceFilesVerified": 47,
+  "DistFilesVerified": 16,
+  "BytesSha256Failures": [],
+  "PortableRelativeMarkdownLinksChecked": 25,
+  "LinkFailures": [],
+  "ManifestSha256": "9833787ae31a67b97d4f4e6168b5c04b55ef7c12c79f2bbe4ada70369a81efb6"
+}

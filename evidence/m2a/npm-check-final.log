@@ -1,0 +1,5 @@
+
+> glossquote-labs-subtitle-bilingual@0.1.0-m1 check
+> node scripts/check.mjs
+
+{"status":"PASS","files":16,"pages":2,"syntax":11,"hosting":{"name":"glossquote-subtitle-bilingual","domain":"bilingual-subs.glossquote.com","assets":"./release-artifacts/site","sha256":"84a36563d8c93010a84c32b53589a81c6884b4d02d1c2f55b004521e8253cc49","runtime":"assets-only","deployed":false}}

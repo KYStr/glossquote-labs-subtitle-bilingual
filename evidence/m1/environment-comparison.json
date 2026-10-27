@@ -1,0 +1,11 @@
+{
+  "Status": "PASS",
+  "CompleteSnapshotsEqual": true,
+  "BeforeGuardStatus": "PASS",
+  "AfterGuardStatus": "PASS",
+  "WrapperExit": 0,
+  "Before": "environment-before.json",
+  "After": "environment-after.json",
+  "Comparison": "Entire Snapshots including PATH hash/type/length/ephemeral arrays and Environment-key fingerprints/TEMP/TMP",
+  "HistoricalWrapperError": "A successful in-process PowerShell script leaves LASTEXITCODE null; first comparison falsely labeled FAIL despite identical snapshots. No drift observed."
+}

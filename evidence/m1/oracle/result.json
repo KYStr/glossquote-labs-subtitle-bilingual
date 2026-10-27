@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "jobId": "job-1",
+  "status": "ready",
+  "mainCueCount": 1,
+  "secondaryCueCount": 1,
+  "matches": [
+    {
+      "mainCueIndex": 0,
+      "secondaryCueIndex": 0,
+      "intersectionMs": 1500,
+      "unionMs": 2000,
+      "iou": {
+        "numerator": 3,
+        "denominator": 4
+      },
+      "kind": "automatic"
+    }
+  ],
+  "ambiguous": [],
+  "unmatchedMain": [],
+  "unmatchedSecondary": [],
+  "keptSeparateMain": [],
+  "keptSeparateSecondary": [],
+  "outputCues": [
+    {
+      "startMs": 0,
+      "endMs": 2000,
+      "lines": [
+        "A",
+        "B"
+      ],
+      "origin": {
+        "mainCueIndex": 0,
+        "secondaryCueIndex": 0
+      }
+    }
+  ]
+}

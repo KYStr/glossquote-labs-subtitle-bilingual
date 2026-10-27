@@ -1,0 +1,793 @@
+diff --git a/evidence/m1b/baseline/HANDOFF.md b/HANDOFF.md
+index 6b39b08..4352ccb 100644
+--- a/evidence/m1b/baseline/HANDOFF.md
++++ b/HANDOFF.md
+@@ -57,3 +57,41 @@ source commit／reviewed commit／released commit：均 `NOT_CREATED`。GitHub `
+ 候選需要從 HTTP static origin 載入 ES modules/worker；`dev` 僅 127.0.0.1:4230。本輪遵照指令沒有啟動 server，亦未確認 port 是否可用；不宣稱直接開 file:// 即可操作。只支援明訂的受限 SRT profile，不做翻譯、ASR、轉檔或通用播放器相容性保證。
+ 
+ 主代理先審查固定 sources 及精確 oracle，之後在已驗證不影響使用者的隔離機制補齊瀏覽器必要 gates。未獲 M2 放行前不出版 GitHub；不跳到 M3 hosting/首頁。只有主代理補完其驗收並發指令後再推進。
++
++## B20-RP-50 — M1B 離線發布準備（2026-10-23）
++
++**本輪 M1B 已完成離線實作與驗證，等待主代理回收獨立核驗；不是 M2 發布放行。** 前述 M1 歷史與 source manifest 不重寫。要求模型 gpt-6.1-sol/max；backend 身分未以自述確認，沒有自行切模型/開對話/委派。
++
++實際來源差異僅 11 檔：修改 `package.json`、`scripts/check.mjs`、`test/merge.test.mjs`、`test/toolchain.test.mjs`、本 `HANDOFF.md`、`TASK-ENTRY.md`；新增 `scripts/release.mjs`、`scripts/validate-m1b.mjs`、`scripts/record-m1b.mjs`、`test/release.test.mjs`、[M1B-RELEASE.md](M1B-RELEASE.md)。兩個既有 test 的唯一行為改動是將合成產物/臨時 copy 改寫到 m1b；產品測試 oracle 不變。新增本輪證據與 release-artifacts，不改 .gitignore。
++
++新增 `build:release` / `check:release`，原 dev/test/check/build 保持。release origin 固定 `https://bilingual-subs.glossquote.com`，toolSlug=`subtitle-bilingual`；不接受 CLI/env 覆寫、無參數/未知 mode/多參數皆拒絕。public 的 16 檔由固定 M1 metadata SHA 保護；HTML 僅改 head robots/SEO links，12 個 JS/CSS 非 SEO 資產及 body 逐 byte 保留。robots/sitemap 只列本工具兩語 canonical；安全 headers 從 public/_headers 保留，僅改 X-Robots-Tag。沒有新增上線/通過宣稱。
++
++`release-artifacts/site/` 是瀏覽器後續應審查的站點根目錄，17 檔、81,590 bytes；`release-artifacts/manifest.json` 是 sibling 審核檔，不進 site。manifest 固定 schemaVersion=1/mode=release-candidate/origin/toolSlug，列 17 個檔與完整 16 個 public source 的 path/bytes/SHA-256，沒有時間、亂數或本機絕對路徑。artifact manifest SHA-256：`7c0572463e122fe437d97d5f1d47381bbc53f4a30e1006f11fe0d8195c2ffc00`。
++
++生成前完整檢查來源及既有輸出；全新檔案 exclusive create，合法相同產物重用且不重寫。篡改/多檔/缺檔/部分產物/未知檔目錄/來源變動/junction 一律拒絕，不遞迴刪除或覆寫。checker 每次重讀來源、重新生成 expected bytes、獨立檢查 title/description/H1/canonical/hreflang/robots，再比對實體檔及 manifest；連 asset+manifest 一起改也不能通過。
++
++### 真實命令與收據
++
++Node v24.14.0；現有 npm-cli.js 以 task-local 空白 user/global config、cache、offline 與關閉 update/audit/fund 執行，所有直接 child `shell:false/windowsHide:true`，沒有 install。
++
++|命令|Exit|實際結果|
++|---|---:|---|
++|`node --test test/release.test.mjs`|0|31/31 針對性發布測試，0 skipped|
++|`npm test`|0|112/112 完整測試，0 FAIL、0 skipped；其中 31 項為本輪新增|
++|`npm run check`|0|preview 16 檔、2 頁、11 JS syntax；原 noindex 通過|
++|`npm run build:release`|0|17 檔/81,590 bytes，第一次建立，reused=false|
++|`npm run check:release`|0|同一固定來源/產物完整通過|
++
++沒有重跑真 root preview build，也沒有啟動 dev/serve/HTTP listener。測試只對 m1b 任務內 copy 做修改/缺檔/junction/污染等負例；每項負例確認拒絕前後檔案 bytes 不變。
++
++[命令總收據](evidence/m1b/commands-final.json)、[npm test](evidence/m1b/npm-test-final.log)、[check](evidence/m1b/npm-check-final.log)、[build:release](evidence/m1b/npm-build-release-final.log)、[check:release](evidence/m1b/npm-check-release-final.log)、[31 項測試](evidence/m1b/release-tests-01.log)。本輪沒有失敗測試、沒有略過檢查；這裡的 PASS 限離線範圍。
++
++持久環境 [before](evidence/m1b/environment-before.json)、[after](evidence/m1b/environment-after.json) 都 PASS，[完整 Snapshots 相等](evidence/m1b/environment-comparison.json)，包含 HKCU/HKLM PATH hash/type/length/ephemeral arrays、完整 Environment-key 指紋與 TEMP/TMP，未觀察到 drift。沒有 Git/source publication 區段，Git settings guard 未執行，亦無 Git/auth/settings 寫入。
++
++[本輪 source/artifact 固定清單](evidence/m1b/source-artifact-manifest.json) 列完整來源與 18 個產物（17 site + sibling manifest）的 bytes/SHA，以及相對 baseline 的 11 檔差異；另外確認原 public/dist/M1 evidence 共 55 檔全部未變。source manifest 不含 evidence、dist、release-artifacts；產物另列。原工具目錄仍未追蹤，不能以空 tracked diff 證明本輪沒有新增；以 baseline copies、差異與固定實體檔核對。
++
++### 尚缺 gate、風險與主代理決定
++
++browser/視覺/原生/真機/AT、實際 Worker/下載/headers/Network/Storage 仍 **NOT_RUN_USER_FOCUS_INCIDENT**。index/follow 與安全 headers 只是候選檔，不代表網站已上線或 hosting 配置已生效。來源變更須後續有界任務重新審核 M1 pin；若不完整輸出由外部修改或中斷造成，工具會拒絕自動修復，需要主代理決定安全復原範圍。本輪沒有此類阻擋，也沒有未決的產品分歧。
++
++source/reviewed/released commit 仍 NOT_CREATED；GitHub/Cloudflare/DNS/hosting/首頁仍 NOT_PUBLISHED/NOT_DEPLOYED。沒讀憑證、沒安裝服務、沒付費、沒啟動 browser/native、沒留下背景服務。原 M1 ZIP/證據保留，沒有另外製作交付 ZIP；由主代理整合單一外層 archive。下一步只交主代理獨立核驗並按既定 gates 決定後續工作；本輪停在 M1B。
+warning: in the working copy of 'tool-projects/50-subtitle-bilingual/M1B-RELEASE.md', LF will be replaced by CRLF the next time Git touches it
+diff --git a/evidence/m1b/baseline/EMPTY b/M1B-RELEASE.md
+index e69de29..7f48969 100644
+--- a/evidence/m1b/baseline/EMPTY
++++ b/M1B-RELEASE.md
+@@ -0,0 +1,50 @@
++# B20-RP-50 — 雙語字幕合併離線發布準備
++
++2026-10-23（Asia/Taipei）。**M1B release candidate，尚未上線，也不是 M2 放行。** 預定 origin 是 `https://bilingual-subs.glossquote.com`，toolSlug 為 `subtitle-bilingual`。原功能對話要求 gpt-6.1-sol/max；不以自述確認 backend 身分。
++
++此輪依主代理 `.runs/batch20-release-prep-2026-10-23/TASK.md` 完成發布工具鏈，不變更產品 runtime、公用首頁或 M1 preview。M1 的實際產品能力與未驗範圍沿用 [HANDOFF](HANDOFF.md) 及既有證據；這不是新的瀏覽器通過證明。
++
++## 重現
++
++現有 Node v24.14.0、npm；不安裝套件。
++
++```text
++npm test
++npm run check
++npm run build:release
++npm run check:release
++```
++
++本輪收據用 `node scripts/validate-m1b.mjs` 依序呼叫現有 npm-cli.js 執行以上四項；所有直接 child 都 `shell:false`、`windowsHide:true`。npm 強制 offline、關閉更新/audit/fund、空白任務內 user/global config 與任務內 cache，避免讀取使用者 npm 設定或將測試快取寫到帳戶位置。沒有 install。此 runner 防止覆蓋既有 final 收據；後續驗證者可直接執行四個命令，應另外保存自己的證據。
++
++核心介面為 `node scripts/release.mjs build` / `check`。無參數、錯 mode、額外參數一律 exit 1；沒有 deploy、任意 origin、環境變數或憑證介面。原 dev/test/check/build 保留，preview 來源未變，因此本輪不重跑原 preview build。
++
++## 審查的產物
++
++瀏覽器驗收者應使用 **`release-artifacts/site/`** 作為靜態站點根目錄。`release-artifacts/manifest.json` 是其 sibling，**不在 site 中**。不要用 `dist/` 代替正式 SEO 候選，也不要將整個工具資料夾當作站點根目錄。ES modules/worker 需要 HTTP origin；本輪未啟動 server，也未確認 port/實際瀏覽器載入能力。任何後續瀏覽器操作都必須先由主代理確認隔離機制符合使用者焦點限制。
++
++site 是原 public 16 檔加 `sitemap.xml` 的去重集合，共 17 檔。兩語 HTML 只修改 head 中 robots 與 canonical/alternate links；body、既有 title/description/H1、語言導覽/警告、全部 JS/CSS 等 12 個非 SEO 資產逐 byte 不變。沒有新增已上線、瀏覽器通過、評價或 structured data 聲明。
++
++- 每頁唯一 canonical：`/index.html`、`/en/index.html`。
++- 每頁同時具有 zh-Hant/en/x-default 互返，x-default 指中文。
++- release meta robots 是 `index,follow`；robots Allow 並列 sitemap；sitemap 只列兩個 canonical，不捏造 lastmod。
++- `_headers` 基於既有 **public/_headers**，只將 X-Robots-Tag 改為 `index, follow`。CSP、connect-src/script-src、worker、隱私及安全 headers 完整保留。這只是配置檔，不能視為實際 hosting header 通過。
++- public 與原 dist 保持 noindex，沒有寫入 canonical/sitemap；原 M1 evidence 不覆寫。
++
++## 來源與防竄改
++
++manifest schemaVersion=1，mode=`release-candidate`，固定 origin/toolSlug；`files` 列全部 site 檔案，`sourceFiles` 列完整 public 來源。每個 entry 都是排序、無重複的相對 POSIX path/bytes/sha256。manifest 不列自身，不含亂數、時間或本機絕對路徑。
++
++`scripts/release.mjs` 固定 M1 public metadata 指紋 `70979b1ef42cf37cae7034124f813e18f3553e1378a92bdd2cca03538dbf3b55`，其計算為完整來源 entry 按 path 排序後 `sha256(JSON.stringify(rows))`。build/check 都實讀來源，拒絕來源變動；check 重新生成預期 bytes、獨立審查雙語完整 SEO、重算每個實體檔案，不採信可被一起改掉的 manifest。
++
++建立前完整檢查來源與現有輸出。第一次只用 exclusive creation；現有輸出只有全數符合預期時重用，且不重寫。modified/extra/missing/partial/unmanaged、symlink/junction、未知檔案/資料夾一律拒絕，不遞迴刪除、不自動修復或覆蓋。若外部修改或寫入中斷留下部分產物，需由主代理決定安全復原範圍；此輪不猜測或刪除。這是靜態檔案核對與拒絕覆寫機制，不是 OS 層對抗同時寫入程序的鎖。
++
++## 驗證與未驗
++
++31 項針對性發布測試已通過：[log](evidence/m1b/release-tests-01.log)。涵蓋固定 domain、雙語 SEO、preview/body/runtime 不變、重建確定、來源變更、asset+manifest 一起竄改、污染/多檔/缺檔、未知目錄、junction、無效 CLI，以及失敗前後 bytes 不變。負例只修改任務內合成 copy。
++
++完整 npm 命令的實際 exit/test 數、來源與產物 hashes、前後環境指紋及差異由 [本輪交接](HANDOFF.md) 與 `evidence/m1b/` 收據列明；[source-artifact-manifest](evidence/m1b/source-artifact-manifest.json) 另外確認原 public/dist/M1 evidence 沒有改動。
++
++真實 browser/視覺/320px/1024px/鍵盤/焦點/dialog、原生選檔/下載、真機/AT、實際 Network/Storage/Worker/headers/hosting 均 **NOT_RUN_USER_FOCUS_INCIDENT**。沒有 GitHub/public source commit、DNS、Cloudflare、hosting 或首頁變更，沒有建立新的使用者交付 ZIP。主代理仍須獨立驗證，再依後續有界任務補必要 gate；不得直接上線此候選。
++
++最終收據：完整 npm test **112/112 PASS、0 FAIL、0 skipped**；check/build:release/check:release 全部 exit 0。17 個 site 檔共 **81,590 bytes**；[artifact manifest](release-artifacts/manifest.json) SHA-256 為 `7c0572463e122fe437d97d5f1d47381bbc53f4a30e1006f11fe0d8195c2ffc00`。前後 Environment 完整 Snapshots 相同。詳 [四個命令收據](evidence/m1b/commands-final.json)、[環境比較](evidence/m1b/environment-comparison.json)。
+warning: in the working copy of 'tool-projects/50-subtitle-bilingual/evidence/m1b/baseline/package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tool-projects/50-subtitle-bilingual/package.json', LF will be replaced by CRLF the next time Git touches it
+diff --git a/evidence/m1b/baseline/package.json b/package.json
+index 01243cf..13f097b 100644
+--- a/evidence/m1b/baseline/package.json
++++ b/package.json
+@@ -8,6 +8,8 @@
+     "dev": "node scripts/serve.mjs",
+     "test": "node --test test/*.test.mjs",
+     "check": "node scripts/check.mjs",
+-    "build": "node scripts/build.mjs"
++    "build": "node scripts/build.mjs",
++    "build:release": "node scripts/release.mjs build",
++    "check:release": "node scripts/release.mjs check"
+   }
+ }
+warning: in the working copy of 'tool-projects/50-subtitle-bilingual/evidence/m1b/baseline/scripts/check.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tool-projects/50-subtitle-bilingual/scripts/check.mjs', LF will be replaced by CRLF the next time Git touches it
+diff --git a/evidence/m1b/baseline/scripts/check.mjs b/scripts/check.mjs
+index 29bdae1..c534d3c 100644
+--- a/evidence/m1b/baseline/scripts/check.mjs
++++ b/scripts/check.mjs
+@@ -59,7 +59,8 @@ export async function checkPackage() {
+   const pkg = JSON.parse(await readFile(resolve(root, 'package.json'), 'utf8'));
+   if (pkg.private !== true || pkg.type !== 'module' || pkg.engines?.node !== '>=24' ||
+     ['dependencies', 'devDependencies', 'optionalDependencies'].some(key => Object.keys(pkg[key] ?? {}).length)) throw new Error('PACKAGE_CONTRACT');
+-  if (JSON.stringify(pkg.scripts) !== JSON.stringify({ dev: 'node scripts/serve.mjs', test: 'node --test test/*.test.mjs', check: 'node scripts/check.mjs', build: 'node scripts/build.mjs' })) throw new Error('PACKAGE_SCRIPTS');
++  if (JSON.stringify(pkg.scripts) !== JSON.stringify({ dev: 'node scripts/serve.mjs', test: 'node --test test/*.test.mjs', check: 'node scripts/check.mjs', build: 'node scripts/build.mjs',
++    'build:release': 'node scripts/release.mjs build', 'check:release': 'node scripts/release.mjs check' })) throw new Error('PACKAGE_SCRIPTS');
+ }
+ 
+ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+warning: in the working copy of 'tool-projects/50-subtitle-bilingual/scripts/record-m1b.mjs', LF will be replaced by CRLF the next time Git touches it
+diff --git a/evidence/m1b/baseline/EMPTY b/scripts/record-m1b.mjs
+index e69de29..127a126 100644
+--- a/evidence/m1b/baseline/EMPTY
++++ b/scripts/record-m1b.mjs
+@@ -0,0 +1,67 @@
++import { readFile, readdir, lstat, writeFile } from 'node:fs/promises';
++import { resolve } from 'node:path';
++import { fileURLToPath } from 'node:url';
++import { sha256 } from './files.mjs';
++import { ORIGIN, TOOL_SLUG, M1_PUBLIC_FINGERPRINT } from './release.mjs';
++
++const root = fileURLToPath(new URL('../', import.meta.url));
++const evidence = resolve(root, 'evidence/m1b');
++async function inventory(directory, prefix = '', skip = () => false) {
++  const rows = [];
++  for (const name of (await readdir(directory)).sort()) {
++    const path = prefix ? `${prefix}/${name}` : name;
++    if (skip(path)) continue;
++    const target = resolve(directory, name), info = await lstat(target);
++    if (info.isSymbolicLink()) throw new Error('M1B_LINK_REJECTED');
++    if (info.isDirectory()) rows.push(...await inventory(target, path, skip));
++    else if (info.isFile()) {
++      const bytes = await readFile(target); rows.push({ path, bytes: bytes.length, sha256: sha256(bytes) });
++    } else throw new Error('M1B_NONFILE_REJECTED');
++  }
++  return rows;
++}
++const json = text => JSON.parse(text.replace(/^\uFEFF/, ''));
++const baseline = json(await readFile(resolve(evidence, 'baseline-inventory.json'), 'utf8'));
++const current = await inventory(root, '', path => /^(evidence\/m1b|release-artifacts)(\/|$)/.test(path));
++const byPath = new Map(current.map(row => [row.path, row]));
++const original = new Map(baseline.map(row => [row.path, row]));
++const allowed = path => ['package.json', '.gitignore', 'HANDOFF.md', 'TASK-ENTRY.md', 'M1B-RELEASE.md'].includes(path) || /^(scripts|test)\//.test(path);
++const changed = [];
++for (const row of baseline) {
++  const now = byPath.get(row.path);
++  if (!now || row.sha256 !== now.sha256 || row.bytes !== now.bytes) {
++    if (!allowed(row.path)) throw new Error(`PROTECTED_DRIFT: ${row.path}`);
++    changed.push({ path: row.path, kind: now ? 'modified' : 'deleted', before: row, after: now ?? null });
++  }
++}
++for (const row of current) if (!original.has(row.path)) {
++  if (!allowed(row.path)) throw new Error(`OUT_OF_SCOPE_ADDITION: ${row.path}`);
++  changed.push({ path: row.path, kind: 'added', before: null, after: row });
++}
++const protectedRows = baseline.filter(row => /^(public|dist|evidence\/m1)\//.test(row.path));
++const sourceSkip = path => /^(dist|evidence|release-artifacts|node_modules|\.git)(\/|$)/.test(path);
++const sources = await inventory(root, '', sourceSkip);
++const artifacts = await inventory(resolve(root, 'release-artifacts'));
++const artifactText = await readFile(resolve(root, 'release-artifacts/manifest.json'));
++const artifactManifest = json(artifactText.toString('utf8'));
++if (artifactManifest.origin !== ORIGIN || artifactManifest.toolSlug !== TOOL_SLUG) throw new Error('ARTIFACT_IDENTITY');
++for (const row of artifactManifest.files) {
++  const actual = artifacts.find(value => value.path === `site/${row.path}`);
++  if (!actual || actual.bytes !== row.bytes || actual.sha256 !== row.sha256) throw new Error('ARTIFACT_DRIFT');
++}
++if (artifacts.length !== artifactManifest.files.length + 1) throw new Error('ARTIFACT_CLOSURE');
++const repeated = await inventory(root, '', sourceSkip);
++if (JSON.stringify(sources) !== JSON.stringify(repeated)) throw new Error('SOURCE_DRIFT_DURING_RECORD');
++const record = { schemaVersion: 1, task: 'B20-RP-50', status: 'M1B_OFFLINE_RELEASE_CANDIDATE',
++  origin: ORIGIN, toolSlug: TOOL_SLUG, m1PublicFingerprint: M1_PUBLIC_FINGERPRINT,
++  protectedFilesUnchanged: protectedRows.length, changes: changed.sort((a, b) => a.path.localeCompare(b.path, 'en')),
++  sourceFiles: sources.length, sourceBytes: sources.reduce((sum, row) => sum + row.bytes, 0), sources,
++  artifactFiles: artifacts.length, artifactBytes: artifacts.reduce((sum, row) => sum + row.bytes, 0), artifacts,
++  artifactManifestSha256: sha256(artifactText),
++  browser: 'NOT_RUN_USER_FOCUS_INCIDENT', sourcePublication: 'NOT_PUBLISHED', hosting: 'NOT_DEPLOYED' };
++const text = JSON.stringify(record, null, 2) + '\n';
++await writeFile(resolve(evidence, 'source-artifact-manifest.json'), text);
++console.log(JSON.stringify({ status: 'PASS', changed: changed.length, protectedUnchanged: record.protectedFilesUnchanged,
++  sourceFiles: record.sourceFiles, sourceBytes: record.sourceBytes, artifactFiles: record.artifactFiles,
++  artifactBytes: record.artifactBytes, artifactManifestSha256: record.artifactManifestSha256,
++  recordBytes: Buffer.byteLength(text), recordSha256: sha256(text) }));
+warning: in the working copy of 'tool-projects/50-subtitle-bilingual/scripts/release.mjs', LF will be replaced by CRLF the next time Git touches it
+diff --git a/evidence/m1b/baseline/EMPTY b/scripts/release.mjs
+index e69de29..e3ba0aa 100644
+--- a/evidence/m1b/baseline/EMPTY
++++ b/scripts/release.mjs
+@@ -0,0 +1,232 @@
++import { lstat, readdir, readFile, mkdir, writeFile } from 'node:fs/promises';
++import { resolve, dirname } from 'node:path';
++import { fileURLToPath } from 'node:url';
++import { PUBLIC_FILES, inspectTree, sha256 } from './files.mjs';
++
++export const ORIGIN = 'https://bilingual-subs.glossquote.com';
++export const TOOL_SLUG = 'subtitle-bilingual';
++// Fixed M1 public bytes, not a value read from the editable release manifest.
++export const M1_PUBLIC_FINGERPRINT = '70979b1ef42cf37cae7034124f813e18f3553e1378a92bdd2cca03538dbf3b55';
++export const SITE_FILES = Object.freeze([...new Set([...PUBLIC_FILES, 'robots.txt', '_headers', 'sitemap.xml'])].sort());
++const toolRoot = fileURLToPath(new URL('../', import.meta.url));
++const fail = code => { throw Object.assign(new Error(code), { code }); };
++const rowsFor = map => [...map.keys()].sort().map(path => ({ path, bytes: map.get(path).byteLength, sha256: sha256(map.get(path)) }));
++const manifestText = manifest => JSON.stringify(manifest, null, 2) + '\n';
++const decoder = new TextDecoder('utf-8', { fatal: true });
++
++export function releaseMode(args) {
++  if (args.length !== 1 || !['build', 'check'].includes(args[0])) fail('RELEASE_ARGUMENTS');
++  return args[0];
++}
++
++function fixedOrigin() {
++  const url = new URL(ORIGIN);
++  if (url.protocol !== 'https:' || url.origin !== ORIGIN || url.hostname !== 'bilingual-subs.glossquote.com' ||
++    url.pathname !== '/' || url.username || url.password || url.port || url.search || url.hash) fail('RELEASE_ORIGIN');
++}
++
++async function directory(path, optional = false) {
++  let stat;
++  try { stat = await lstat(path); }
++  catch (error) { if (optional && error.code === 'ENOENT') return false; fail('RELEASE_DIRECTORY_MISSING'); }
++  if (stat.isSymbolicLink() || !stat.isDirectory()) fail('RELEASE_DIRECTORY_UNSAFE');
++  return true;
++}
++
++async function sourceBytes(root) {
++  await directory(root);
++  const publicRoot = resolve(root, 'public');
++  await inspectTree(publicRoot);
++  const data = new Map();
++  for (const path of PUBLIC_FILES) data.set(path, await readFile(resolve(publicRoot, path)));
++  const rows = rowsFor(data);
++  if (sha256(JSON.stringify(rows)) !== M1_PUBLIC_FINGERPRINT) fail('RELEASE_SOURCE_CHANGED');
++  return { data, rows };
++}
++
++function headRange(html) {
++  const opens = [...html.matchAll(/<head>/g)];
++  const closes = [...html.matchAll(/<\/head>/g)];
++  if (opens.length !== 1 || closes.length !== 1 || opens[0].index >= closes[0].index) fail('RELEASE_HEAD');
++  return { start: opens[0].index + 6, end: closes[0].index };
++}
++
++function htmlRelease(bytes, path) {
++  const html = decoder.decode(bytes);
++  const { start, end } = headRange(html);
++  let head = html.slice(start, end);
++  const previewRobots = '<meta name="robots" content="noindex,nofollow,noarchive">';
++  if (head.split(previewRobots).length !== 2 || /rel=["'](?:canonical|alternate)["']/i.test(head)) fail('RELEASE_PREVIEW_SEO');
++  head = head.replace(previewRobots, '<meta name="robots" content="index,follow">');
++  head += `  <link rel="canonical" href="${ORIGIN}/${path}">\n`;
++  for (const [lang, page] of [['zh-Hant', 'index.html'], ['en', 'en/index.html'], ['x-default', 'index.html']]) {
++    head += `  <link rel="alternate" hreflang="${lang}" href="${ORIGIN}/${page}">\n`;
++  }
++  return Buffer.from(html.slice(0, start) + head + html.slice(end), 'utf8');
++}
++
++function headersRelease(bytes) {
++  const text = decoder.decode(bytes);
++  const rule = /^([ \t]*X-Robots-Tag:[ \t]*)noindex, nofollow, noarchive(?=\r?$)/gm;
++  if ([...text.matchAll(rule)].length !== 1) fail('RELEASE_PREVIEW_HEADERS');
++  return Buffer.from(text.replace(rule, '$1index, follow'), 'utf8');
++}
++
++// This narrow static auditor parses complete relevant tags/attributes. It is not a browser parser.
++function attrs(text) {
++  const values = {};
++  const pattern = /\s+([a-zA-Z][a-zA-Z0-9:-]*)\s*=\s*(?:"([^"]*)"|'([^']*)')/gy;
++  let cursor = 0;
++  while (cursor < text.length) {
++    if (!text.slice(cursor).trim()) break;
++    pattern.lastIndex = cursor;
++    const match = pattern.exec(text);
++    if (!match || Object.hasOwn(values, match[1].toLowerCase())) fail('RELEASE_HTML_ATTRIBUTES');
++    values[match[1].toLowerCase()] = match[2] ?? match[3];
++    cursor = pattern.lastIndex;
++  }
++  return values;
++}
++
++function tags(html, name) {
++  return [...html.matchAll(new RegExp(`<${name}\\b([^<>]*?)>`, 'gi'))].map(match => ({
++    index: match.index, end: match.index + match[0].length, attrs: attrs(match[1])
++  }));
++}
++
++const HTML_CONTRACT = {
++  'index.html': { lang: 'zh-Hant', title: '雙語字幕合併｜Gloss Tools', h1: '把兩份 SRT 合成雙語字幕',
++    description: '在本機合併兩份 SRT 字幕，按時間重疊配對、檢查歧義並保留未配對字幕，再下載雙語 SRT。' },
++  'en/index.html': { lang: 'en', title: 'Merge Bilingual Subtitles | Gloss Tools', h1: 'Merge two SRT files into bilingual subtitles',
++    description: 'Match two SRT files by timeline, review ambiguous and unmatched cues, then download a bilingual SRT locally.' }
++};
++
++export function auditReleaseHtml(bytes, path) {
++  const html = decoder.decode(bytes);
++  const expected = HTML_CONTRACT[path];
++  if (!expected) fail('RELEASE_HTML_PATH');
++  const range = headRange(html);
++  const insideHead = tag => tag.index >= range.start && tag.end <= range.end;
++  const roots = tags(html, 'html');
++  if (roots.length !== 1 || roots[0].attrs.lang !== expected.lang) fail('RELEASE_HTML_LANGUAGE');
++  const titles = [...html.matchAll(/<title>([\s\S]*?)<\/title>/gi)];
++  const h1s = [...html.matchAll(/<h1>([\s\S]*?)<\/h1>/gi)];
++  if (titles.length !== 1 || titles[0][1] !== expected.title || titles[0].index < range.start || titles[0].index >= range.end ||
++    h1s.length !== 1 || h1s[0][1] !== expected.h1 || h1s[0].index < range.end) fail('RELEASE_HTML_CONTENT');
++  const metas = tags(html, 'meta');
++  const robots = metas.filter(tag => tag.attrs.name?.toLowerCase() === 'robots');
++  const descriptions = metas.filter(tag => tag.attrs.name?.toLowerCase() === 'description');
++  if (robots.length !== 1 || robots[0].attrs.content !== 'index,follow' || !insideHead(robots[0]) ||
++    descriptions.length !== 1 || descriptions[0].attrs.content !== expected.description || !insideHead(descriptions[0])) fail('RELEASE_HTML_META');
++  const links = tags(html, 'link');
++  const canonical = links.filter(tag => tag.attrs.rel?.toLowerCase() === 'canonical');
++  const alternates = links.filter(tag => tag.attrs.rel?.toLowerCase() === 'alternate');
++  if (canonical.length !== 1 || canonical[0].attrs.href !== `${ORIGIN}/${path}` || !insideHead(canonical[0])) fail('RELEASE_HTML_CANONICAL');
++  const languagePages = { 'zh-Hant': 'index.html', en: 'en/index.html', 'x-default': 'index.html' };
++  if (alternates.length !== 3 || new Set(alternates.map(tag => tag.attrs.hreflang)).size !== 3 ||
++    alternates.some(tag => !insideHead(tag) || !Object.hasOwn(languagePages, tag.attrs.hreflang) || tag.attrs.href !== `${ORIGIN}/${languagePages[tag.attrs.hreflang]}`)) fail('RELEASE_HTML_ALTERNATES');
++  return { path, lang: roots[0].attrs.lang, canonical: canonical[0].attrs.href,
++    alternates: alternates.map(tag => ({ lang: tag.attrs.hreflang, href: tag.attrs.href })) };
++}
++
++async function expectedRelease(root) {
++  if (Number(process.versions.node.split('.')[0]) !== 24) fail('NODE_24_REQUIRED');
++  fixedOrigin();
++  const source = await sourceBytes(root);
++  const site = new Map(source.data);
++  for (const path of Object.keys(HTML_CONTRACT)) {
++    const bytes = htmlRelease(source.data.get(path), path);
++    auditReleaseHtml(bytes, path);
++    site.set(path, bytes);
++  }
++  site.set('robots.txt', Buffer.from(`User-agent: *\nAllow: /\nSitemap: ${ORIGIN}/sitemap.xml\n`));
++  site.set('_headers', headersRelease(source.data.get('_headers')));
++  site.set('sitemap.xml', Buffer.from(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>${ORIGIN}/index.html</loc></url>\n  <url><loc>${ORIGIN}/en/index.html</loc></url>\n</urlset>\n`));
++  const manifest = { schemaVersion: 1, mode: 'release-candidate', origin: ORIGIN, toolSlug: TOOL_SLUG,
++    files: rowsFor(site), sourceFiles: source.rows };
++  return { site, manifest, text: manifestText(manifest) };
++}
++
++async function inspectSite(siteRoot) {
++  const allowedDirs = new Set(SITE_FILES.flatMap(path => {
++    const chunks = path.split('/'); return chunks.slice(0, -1).map((_, i) => chunks.slice(0, i + 1).join('/'));
++  }));
++  const found = [];
++  async function walk(path, prefix = '') {
++    await directory(path);
++    for (const name of (await readdir(path)).sort()) {
++      const relative = prefix ? `${prefix}/${name}` : name;
++      const target = resolve(path, name);
++      const stat = await lstat(target);
++      if (stat.isSymbolicLink()) fail('RELEASE_LINK');
++      if (stat.isDirectory()) {
++        if (!allowedDirs.has(relative)) fail('RELEASE_UNKNOWN_DIRECTORY');
++        await walk(target, relative);
++      } else {
++        if (!stat.isFile() || !SITE_FILES.includes(relative)) fail('RELEASE_UNKNOWN_FILE');
++        found.push(relative);
++      }
++    }
++  }
++  await walk(siteRoot);
++  if (JSON.stringify(found.sort()) !== JSON.stringify(SITE_FILES)) fail('RELEASE_MISSING_FILE');
++}
++
++async function verifyOutput(root, expected) {
++  const output = resolve(root, 'release-artifacts');
++  await directory(output);
++  const entries = (await readdir(output)).sort();
++  if (JSON.stringify(entries) !== JSON.stringify(['manifest.json', 'site'])) fail('RELEASE_UNMANAGED_OUTPUT');
++  const manifestPath = resolve(output, 'manifest.json');
++  const info = await lstat(manifestPath);
++  if (info.isSymbolicLink() || !info.isFile()) fail('RELEASE_MANIFEST_UNSAFE');
++  await inspectSite(resolve(output, 'site'));
++  const actualText = await readFile(manifestPath, 'utf8');
++  let manifest;
++  try { manifest = JSON.parse(actualText); } catch { fail('RELEASE_MANIFEST_JSON'); }
++  if (manifest.schemaVersion !== 1 || manifest.mode !== 'release-candidate' || manifest.origin !== ORIGIN || manifest.toolSlug !== TOOL_SLUG ||
++    actualText !== expected.text) fail('RELEASE_MANIFEST_MISMATCH');
++  for (const path of SITE_FILES) {
++    const actual = await readFile(resolve(output, 'site', path));
++    if (Object.hasOwn(HTML_CONTRACT, path)) auditReleaseHtml(actual, path);
++    if (!actual.equals(expected.site.get(path))) fail('RELEASE_BYTES_MISMATCH');
++  }
++  // Catch a source change during generation/checking as well as one before it.
++  await sourceBytes(root);
++  return { status: 'PASS', mode: 'release-candidate', origin: ORIGIN, toolSlug: TOOL_SLUG,
++    sourceFiles: expected.manifest.sourceFiles.length, files: expected.manifest.files.length,
++    siteBytes: expected.manifest.files.reduce((sum, row) => sum + row.bytes, 0), manifestSha256: sha256(actualText),
++    sourceFingerprint: M1_PUBLIC_FINGERPRINT, browser: 'NOT_RUN_USER_FOCUS_INCIDENT', published: false };
++}
++
++export async function checkRelease(root = toolRoot) {
++  const expected = await expectedRelease(root);
++  return verifyOutput(root, expected);
++}
++
++export async function buildRelease(root = toolRoot) {
++  const expected = await expectedRelease(root);
++  const output = resolve(root, 'release-artifacts');
++  if (await directory(output, true)) return { ...await verifyOutput(root, expected), reused: true };
++  // All sources and any existing output have been checked before the first write.
++  // Exclusive creation prevents replacing a race-created file or unmanaged output.
++  await mkdir(output);
++  await mkdir(resolve(output, 'site'));
++  for (const path of SITE_FILES) {
++    const target = resolve(output, 'site', path);
++    await mkdir(dirname(target), { recursive: true });
++    await writeFile(target, expected.site.get(path), { flag: 'wx' });
++  }
++  await writeFile(resolve(output, 'manifest.json'), expected.text, { flag: 'wx' });
++  return { ...await verifyOutput(root, expected), reused: false };
++}
++
++if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
++  try {
++    const mode = releaseMode(process.argv.slice(2));
++    console.log(JSON.stringify(await (mode === 'build' ? buildRelease() : checkRelease())));
++  } catch (error) {
++    console.error(`Release candidate rejected: ${/^(RELEASE_|NODE_24_)/.test(error.code ?? '') ? error.code : 'RELEASE_IO_OR_SOURCE_INVALID'}`);
++    process.exitCode = 1;
++  }
++}
+warning: in the working copy of 'tool-projects/50-subtitle-bilingual/scripts/validate-m1b.mjs', LF will be replaced by CRLF the next time Git touches it
+diff --git a/evidence/m1b/baseline/EMPTY b/scripts/validate-m1b.mjs
+index e69de29..ea22550 100644
+--- a/evidence/m1b/baseline/EMPTY
++++ b/scripts/validate-m1b.mjs
+@@ -0,0 +1,54 @@
++import { readFile, writeFile, mkdir, access } from 'node:fs/promises';
++import { constants } from 'node:fs';
++import { spawnSync } from 'node:child_process';
++import { dirname, resolve } from 'node:path';
++import { fileURLToPath } from 'node:url';
++
++const root = fileURLToPath(new URL('../', import.meta.url));
++const evidence = resolve(root, 'evidence/m1b');
++const npmCli = resolve(dirname(process.execPath), 'node_modules/npm/bin/npm-cli.js');
++const steps = [
++  ['npm test', ['test'], 'npm-test-final.log'],
++  ['npm run check', ['run', 'check'], 'npm-check-final.log'],
++  ['npm run build:release', ['run', 'build:release'], 'npm-build-release-final.log'],
++  ['npm run check:release', ['run', 'check:release'], 'npm-check-release-final.log']
++];
++
++if (Number(process.versions.node.split('.')[0]) !== 24) throw new Error('NODE_24_REQUIRED');
++await access(npmCli, constants.R_OK);
++await mkdir(evidence, { recursive: true });
++for (const path of ['commands-final.json', ...steps.map(step => step[2])]) {
++  try { await access(resolve(evidence, path)); throw new Error('FINAL_EVIDENCE_ALREADY_EXISTS'); }
++  catch (error) { if (error.code !== 'ENOENT') throw error; }
++}
++const userConfig = resolve(evidence, 'npm-user.conf');
++const globalConfig = resolve(evidence, 'npm-global.conf');
++await writeFile(userConfig, '', { flag: 'wx' });
++await writeFile(globalConfig, '', { flag: 'wx' });
++const flags = [`--userconfig=${userConfig}`, `--globalconfig=${globalConfig}`,
++  `--cache=${resolve(evidence, 'npm-cache')}`, '--logs-max=0', '--offline', '--audit=false', '--fund=false', '--update-notifier=false'];
++const records = [];
++for (const [command, args, log] of steps) {
++  const child = spawnSync(process.execPath, [npmCli, ...flags, ...args], {
++    cwd: root, shell: false, windowsHide: true, encoding: 'utf8', timeout: 60_000, maxBuffer: 4 * 1024 * 1024
++  });
++  const output = (child.stdout ?? '') + (child.stderr ? `\n${child.stderr}` : '');
++  await writeFile(resolve(evidence, log), output, { flag: 'wx' });
++  records.push({ command, exit: child.status, signal: child.signal, error: child.error?.code ?? null, log });
++  console.log(JSON.stringify(records.at(-1)));
++  if (child.status !== 0) break;
++}
++const testRecord = records.find(row => row.command === 'npm test');
++const testText = testRecord ? await readFile(resolve(evidence, testRecord.log), 'utf8') : '';
++const counts = {};
++for (const label of ['tests', 'pass', 'fail', 'skipped']) {
++  const match = new RegExp(`(?:^|\\n)[^\\n]*?\\b${label} (\\d+)(?:\\r?\\n|$)`).exec(testText);
++  if (match) counts[label] = Number(match[1]);
++}
++const result = { status: records.length === steps.length && records.every(row => row.exit === 0) ? 'PASS' : 'FAIL',
++  node: process.version, commands: records, tests: counts,
++  npmInvocation: 'Existing npm-cli.js through current Node; shell:false/windowsHide:true; offline, update checks disabled, empty task-local user/global config and task-local cache; no install.',
++  browser: 'NOT_RUN_USER_FOCUS_INCIDENT', publication: 'NOT_PUBLISHED' };
++await writeFile(resolve(evidence, 'commands-final.json'), JSON.stringify(result, null, 2) + '\n', { flag: 'wx' });
++console.log(JSON.stringify({ status: result.status, tests: counts }));
++if (result.status !== 'PASS') process.exitCode = 1;
+warning: in the working copy of 'tool-projects/50-subtitle-bilingual/evidence/m1b/baseline/TASK-ENTRY.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tool-projects/50-subtitle-bilingual/TASK-ENTRY.md', LF will be replaced by CRLF the next time Git touches it
+diff --git a/evidence/m1b/baseline/TASK-ENTRY.md b/TASK-ENTRY.md
+index 7df245a..39e6ec3 100644
+--- a/evidence/m1b/baseline/TASK-ENTRY.md
++++ b/TASK-ENTRY.md
+@@ -20,3 +20,17 @@ M1 最終驗證：Node v24.14.0，`node --test` exit 0（81/81）、check exit 0
+ 歷史缺失已保留：test-01 的兩個測試 fixture/expectation 錯誤、環境 wrapper 的 null LASTEXITCODE 誤判；修正後驗證通過，未發生環境 drift。沒有服務、server、browser、子代理或背景 process 遺留；只啟動任務擁有的 Node test worker，測試內已 terminate。
+ 
+ 實際改動只在 package/.gitignore/public/scripts/test/HANDOFF/TASK-ENTRY/evidence/m1 與生成 dist。原始規格唯讀；本工具尚未追蹤，無 tracked diff/commit；沒有 GitHub/部署/首頁變動。停在 M1，本輪不開後續 milestone，也不輪詢等待。
++
++## B20-RP-50 / M1B（2026-10-23）
++
++主代理已明確派送離線發布準備，取代前輪「停在 M1」的進度限制；這不是 M2 發布放行。已完整讀 `.runs/batch20-release-prep-2026-10-23/TASK.md` 的 10 項契約，沿用原產品與安全/設計內容。requested gpt-6.1-sol/max，backend 未獨立確認；沒有切換模型、再委派或開新 chat。
++
++只改 package.json、scripts/**、test/**、本 TASK-ENTRY/HANDOFF，新增 M1B-RELEASE.md、evidence/m1b 與 release-artifacts。public/dist/舊 evidence/原規格/兄弟工具不寫入。兩個既有測試只將產物/臨時 copy 目錄改為 m1b，以免完整 npm test 覆寫歷史 M1。
++
++完成標準：固定 origin `https://bilingual-subs.glossquote.com` 的獨立產物、head-only 雙語 SEO、robots/sitemap/完整安全 headers、閉合 allowlist/確定重建/來源與產物防竄改；完整 npm test/check/build:release/check:release 真實收據與環境前後相同；browser 仍 NOT_RUN_USER_FOCUS_INCIDENT。不做 GitHub/部署/首頁，也不啟動 serve。
++
++初始 baseline 86 檔，其中 public/dist/舊 M1 evidence 55 檔另行逐 byte/SHA 保護。M1B 來源/產物與實際差異由 scripts/record-m1b.mjs 在收尾時產生；不執行會重寫 evidence/m1 的舊 scripts/freeze.mjs。31 項針對性發布測試已通過，最終完整命令以 evidence/m1b/commands-final.json 為準。
++
++M1B 最終命令（一次完整 suite）：npm test exit 0，112 tests/112 pass/0 fail/0 skipped；npm run check、build:release、check:release 均 exit 0。site 17 檔/81,590 bytes，manifest SHA-256 `7c0572463e122fe437d97d5f1d47381bbc53f4a30e1006f11fe0d8195c2ffc00`。全部 Environment Snapshots 前後相等。原預覽 build 命令未重跑；既有 build 函式只由原工具鏈測試作用於 m1b 的合成 copy，不寫真 dist。
++
++本輪沒有未解的實作阻擋或必須由主代理選擇的產品分歧。仍需主代理回收獨立驗證、補真實瀏覽器 gates 並另行決定 M2；停在 M1B，不公開、不部署、不輪詢或另開對話。
+warning: in the working copy of 'tool-projects/50-subtitle-bilingual/evidence/m1b/baseline/test/merge.test.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tool-projects/50-subtitle-bilingual/test/merge.test.mjs', LF will be replaced by CRLF the next time Git touches it
+diff --git a/evidence/m1b/baseline/test/merge.test.mjs b/test/merge.test.mjs
+index a4146c9..82ca248 100644
+--- a/evidence/m1b/baseline/test/merge.test.mjs
++++ b/test/merge.test.mjs
+@@ -41,7 +41,7 @@ test('AC07/16 actual artifact bytes match an independently written SRT oracle',
+   const actual = bytes(serializeSrt(result.outputCues));
+   assert.deepEqual(new Uint8Array(actual), new Uint8Array(bytes(EXPECTED)));
+   assert.notEqual(new Uint8Array(actual)[0], 0xef);
+-  const directory = new URL('../evidence/m1/oracle/', import.meta.url);
++  const directory = new URL('../evidence/m1b/oracle/', import.meta.url);
+   await mkdir(directory, { recursive: true });
+   await writeFile(new URL('main.synthetic.srt', directory), new Uint8Array(bytes(MAIN)));
+   await writeFile(new URL('secondary.synthetic.srt', directory), new Uint8Array(bytes(SECONDARY)));
+warning: in the working copy of 'tool-projects/50-subtitle-bilingual/test/release.test.mjs', LF will be replaced by CRLF the next time Git touches it
+diff --git a/evidence/m1b/baseline/EMPTY b/test/release.test.mjs
+index e69de29..3cc8786 100644
+--- a/evidence/m1b/baseline/EMPTY
++++ b/test/release.test.mjs
+@@ -0,0 +1,228 @@
++import test from 'node:test';
++import assert from 'node:assert/strict';
++import { cp, readFile, writeFile, mkdir, mkdtemp, readdir, lstat, rm, rename, symlink } from 'node:fs/promises';
++import { resolve, join } from 'node:path';
++import { fileURLToPath } from 'node:url';
++import { spawnSync } from 'node:child_process';
++import { createHash } from 'node:crypto';
++import { buildRelease, checkRelease, auditReleaseHtml, releaseMode, ORIGIN, TOOL_SLUG, M1_PUBLIC_FINGERPRINT } from '../scripts/release.mjs';
++import { PUBLIC_FILES, inside, snapshot } from '../scripts/files.mjs';
++
++const root = fileURLToPath(new URL('../', import.meta.url));
++const fixtures = resolve(root, 'evidence/m1b/test-workspaces');
++const EXPECTED_ORIGIN = 'https://bilingual-subs.glossquote.com';
++const digest = bytes => createHash('sha256').update(bytes).digest('hex');
++
++async function inventory(directory, prefix = '') {
++  const rows = [];
++  for (const name of (await readdir(directory)).sort()) {
++    const path = join(directory, name), relative = prefix ? `${prefix}/${name}` : name;
++    const info = await lstat(path);
++    if (info.isSymbolicLink()) rows.push({ path: relative, kind: 'link' });
++    else if (info.isDirectory()) { rows.push({ path: relative, kind: 'directory' }); rows.push(...await inventory(path, relative)); }
++    else { const bytes = await readFile(path); rows.push({ path: relative, bytes: bytes.length, sha256: digest(bytes) }); }
++  }
++  return rows;
++}
++
++async function workspace(action, { built = true } = {}) {
++  await mkdir(fixtures, { recursive: true });
++  const directory = await mkdtemp(join(fixtures, 'release-synthetic-'));
++  try {
++    await cp(resolve(root, 'public'), join(directory, 'public'), { recursive: true });
++    if (built) await buildRelease(directory);
++    return await action(directory);
++  } finally {
++    const target = resolve(directory);
++    assert.ok(inside(fixtures, target) && target !== fixtures);
++    assert.equal((await lstat(target)).isSymbolicLink(), false);
++    await rm(target, { recursive: true, force: false });
++  }
++}
++
++async function rejectedWithoutWrite(directory, pattern = /RELEASE_|UNKNOWN_|MISSING_/) {
++  const before = await inventory(directory);
++  await assert.rejects(() => checkRelease(directory), pattern);
++  assert.deepEqual(await inventory(directory), before);
++  await assert.rejects(() => buildRelease(directory), pattern);
++  assert.deepEqual(await inventory(directory), before);
++}
++
++async function forgedManifest(directory, path, bytes) {
++  const manifestPath = join(directory, 'release-artifacts/manifest.json');
++  const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
++  const row = manifest.files.find(row => row.path === path);
++  assert.ok(row); row.bytes = bytes.length; row.sha256 = digest(bytes);
++  await writeFile(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
++}
++
++test('RP01/02 fixed origin/slug, strict mode; no environmental or CLI origin injection', () => {
++  assert.equal(ORIGIN, EXPECTED_ORIGIN); assert.equal(TOOL_SLUG, 'subtitle-bilingual');
++  assert.equal(M1_PUBLIC_FINGERPRINT, '70979b1ef42cf37cae7034124f813e18f3553e1378a92bdd2cca03538dbf3b55');
++  assert.equal(releaseMode(['build']), 'build'); assert.equal(releaseMode(['check']), 'check');
++  for (const args of [[], ['deploy'], ['Build'], ['build', 'extra'], ['check', '--origin', 'https://evil.invalid']]) {
++    assert.throws(() => releaseMode(args), { code: 'RELEASE_ARGUMENTS' });
++  }
++});
++
++test('RP01/08 real CLI rejects missing/wrong/extra arguments before creating output (own copy)', async () => workspace(async directory => {
++  await mkdir(join(directory, 'scripts'));
++  await cp(join(root, 'scripts/release.mjs'), join(directory, 'scripts/release.mjs'));
++  await cp(join(root, 'scripts/files.mjs'), join(directory, 'scripts/files.mjs'));
++  await writeFile(join(directory, 'package.json'), '{"type":"module"}\n');
++  const before = await inventory(directory);
++  for (const args of [[], ['publish'], ['build', 'unexpected'], ['check', '--origin=https://evil.invalid']]) {
++    const child = spawnSync(process.execPath, [join(directory, 'scripts/release.mjs'), ...args], {
++      cwd: directory, shell: false, windowsHide: true, encoding: 'utf8', timeout: 10_000
++    });
++    assert.equal(child.status, 1); assert.equal(child.stdout, ''); assert.match(child.stderr, /RELEASE_ARGUMENTS/);
++    assert.deepEqual(await inventory(directory), before);
++  }
++}, { built: false }));
++
++test('RP03–07 real files: head-only bilingual SEO, exact robots/sitemap/security headers and M1 assets', async () => workspace(async directory => {
++  const output = join(directory, 'release-artifacts/site');
++  const original = await snapshot(join(directory, 'public'));
++  const manifestBytes = await readFile(join(directory, 'release-artifacts/manifest.json'));
++  const manifest = JSON.parse(manifestBytes);
++  assert.deepEqual(Object.keys(manifest), ['schemaVersion', 'mode', 'origin', 'toolSlug', 'files', 'sourceFiles']);
++  assert.equal(manifest.schemaVersion, 1); assert.equal(manifest.mode, 'release-candidate');
++  assert.equal(manifest.origin, EXPECTED_ORIGIN); assert.equal(manifest.toolSlug, 'subtitle-bilingual');
++  assert.equal(manifest.files.length, 17); assert.deepEqual(manifest.sourceFiles, original);
++  assert.deepEqual(manifest.files.map(row => row.path), [...PUBLIC_FILES, 'sitemap.xml'].sort());
++  assert.equal(new Set(manifest.files.map(row => row.path)).size, 17);
++  assert.doesNotMatch(manifestBytes.toString(), /[A-Z]:\\|createdAt|timestamp|lastmod|\.\.\//);
++  for (const path of PUBLIC_FILES.filter(path => !['index.html', 'en/index.html', '_headers', 'robots.txt'].includes(path))) {
++    assert.deepEqual(await readFile(join(output, path)), await readFile(join(directory, 'public', path)));
++  }
++  for (const [path, lang] of [['index.html', 'zh-Hant'], ['en/index.html', 'en']]) {
++    const html = await readFile(join(output, path), 'utf8');
++    const preview = await readFile(join(directory, 'public', path), 'utf8');
++    const audited = auditReleaseHtml(Buffer.from(html), path);
++    assert.equal(audited.lang, lang); assert.equal(audited.canonical, `${EXPECTED_ORIGIN}/${path}`);
++    // Independent extraction: expected links are handwritten, not copied from the release manifest.
++    const links = [...html.matchAll(/<link rel="(canonical|alternate)"(?: hreflang="([^"]+)")? href="([^"]+)">/g)]
++      .map(match => [match[1], match[2] ?? null, match[3]]);
++    assert.deepEqual(links, [
++      ['canonical', null, `${EXPECTED_ORIGIN}/${path}`],
++      ['alternate', 'zh-Hant', 'https://bilingual-subs.glossquote.com/index.html'],
++      ['alternate', 'en', 'https://bilingual-subs.glossquote.com/en/index.html'],
++      ['alternate', 'x-default', 'https://bilingual-subs.glossquote.com/index.html']
++    ]);
++    assert.equal(html.split('</head>')[1], preview.split('</head>')[1]);
++    const restored = html.replace('content="index,follow"', 'content="noindex,nofollow,noarchive"')
++      .replace(/^  <link rel="(?:canonical|alternate)"[^\n]*\n/gm, '');
++    assert.equal(restored, preview);
++    assert.match(preview, /name="robots" content="noindex,nofollow,noarchive"/);
++    assert.doesNotMatch(preview, /rel="canonical"|hreflang="x-default"/);
++  }
++  assert.equal(await readFile(join(output, 'robots.txt'), 'utf8'), 'User-agent: *\nAllow: /\nSitemap: https://bilingual-subs.glossquote.com/sitemap.xml\n');
++  const sitemap = await readFile(join(output, 'sitemap.xml'), 'utf8');
++  assert.deepEqual([...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(match => match[1]), [
++    'https://bilingual-subs.glossquote.com/index.html', 'https://bilingual-subs.glossquote.com/en/index.html'
++  ]);
++  assert.match(sitemap, /xmlns="http:\/\/www.sitemaps.org\/schemas\/sitemap\/0.9"/); assert.doesNotMatch(sitemap, /lastmod/);
++  const headers = await readFile(join(output, '_headers'), 'utf8');
++  assert.equal(headers.replace('X-Robots-Tag: index, follow', 'X-Robots-Tag: noindex, nofollow, noarchive'),
++    await readFile(join(directory, 'public/_headers'), 'utf8'));
++  assert.match(headers, /connect-src 'none'/); assert.match(headers, /script-src 'self'/);
++  for (const row of manifest.files) {
++    const bytes = await readFile(join(output, row.path)); assert.equal(bytes.length, row.bytes); assert.equal(digest(bytes), row.sha256);
++  }
++  assert.deepEqual(await snapshot(join(directory, 'public')), original);
++  assert.equal((await checkRelease(directory)).published, false);
++}));
++
++test('RP03/08 identical rebuild reuses bytes and deterministic manifest without rewriting', async () => workspace(async directory => {
++  const before = await inventory(join(directory, 'release-artifacts'));
++  const manifestPath = join(directory, 'release-artifacts/manifest.json'); const stat = await lstat(manifestPath);
++  assert.equal((await buildRelease(directory)).reused, true);
++  assert.deepEqual(await inventory(join(directory, 'release-artifacts')), before);
++  assert.equal((await lstat(manifestPath)).mtimeMs, stat.mtimeMs);
++  assert.equal((await checkRelease(directory)).files, 17);
++}));
++
++test('RP03 check with missing release does not create files', async () => workspace(async directory => {
++  const before = await inventory(directory); await assert.rejects(() => checkRelease(directory), /RELEASE_DIRECTORY_MISSING/);
++  assert.deepEqual(await inventory(directory), before);
++}, { built: false }));
++
++for (const [name, mutate] of [
++  ['tampered runtime', async directory => { await writeFile(join(directory, 'release-artifacts/site/js/app.js'), 'synthetic changed runtime\n'); }],
++  ['extra site file', async directory => { await writeFile(join(directory, 'release-artifacts/site/operator-note.txt'), 'synthetic preserve'); }],
++  ['extra site directory', async directory => { await mkdir(join(directory, 'release-artifacts/site/unmanaged')); }],
++  ['missing expected asset', async directory => { await rm(join(directory, 'release-artifacts/site/js/ui.js')); }],
++  ['extra output-root file', async directory => { await writeFile(join(directory, 'release-artifacts/operator-note.txt'), 'synthetic preserve'); }],
++  ['manifest incorrectly included in site', async directory => { await cp(join(directory, 'release-artifacts/manifest.json'), join(directory, 'release-artifacts/site/manifest.json')); }],
++  ['wrong manifest origin', async directory => {
++    const path = join(directory, 'release-artifacts/manifest.json'); const value = JSON.parse(await readFile(path)); value.origin = 'https://wrong.glossquote.com'; await writeFile(path, JSON.stringify(value, null, 2) + '\n');
++  }],
++  ['duplicate manifest path', async directory => {
++    const path = join(directory, 'release-artifacts/manifest.json'); const value = JSON.parse(await readFile(path)); value.files[1] = value.files[0]; await writeFile(path, JSON.stringify(value, null, 2) + '\n');
++  }],
++  ['traversal manifest path', async directory => {
++    const path = join(directory, 'release-artifacts/manifest.json'); const value = JSON.parse(await readFile(path)); value.files[0].path = '../unmanaged'; await writeFile(path, JSON.stringify(value, null, 2) + '\n');
++  }],
++  ['unknown manifest property', async directory => {
++    const path = join(directory, 'release-artifacts/manifest.json'); const value = JSON.parse(await readFile(path)); value.verifiedLive = true; await writeFile(path, JSON.stringify(value, null, 2) + '\n');
++  }],
++  ['polluted robots', async directory => { await writeFile(join(directory, 'release-artifacts/site/robots.txt'), 'User-agent: *\nDisallow: /\n'); }],
++  ['extra sitemap URL', async directory => { const path = join(directory, 'release-artifacts/site/sitemap.xml'); await writeFile(path, (await readFile(path, 'utf8')).replace('</urlset>', '<url><loc>https://evil.invalid/</loc></url></urlset>')); }],
++  ['weakened CSP', async directory => { const path = join(directory, 'release-artifacts/site/_headers'); await writeFile(path, (await readFile(path, 'utf8')).replace("connect-src 'none'", 'connect-src *')); }]
++]) {
++  test(`RP03/07/08 reject ${name}; check/build preserve every existing byte`, async () => workspace(async directory => {
++    await mutate(directory); await rejectedWithoutWrite(directory);
++  }));
++}
++
++test('RP07 asset and manifest forged together still rejected', async () => workspace(async directory => {
++  const path = 'js/app.js', bytes = Buffer.from('synthetic forged runtime\n');
++  await writeFile(join(directory, 'release-artifacts/site', path), bytes); await forgedManifest(directory, path, bytes);
++  await rejectedWithoutWrite(directory, /RELEASE_MANIFEST_MISMATCH|RELEASE_BYTES_MISMATCH/);
++}));
++
++for (const [name, mutate, error] of [
++  ['wrong-domain canonical', html => html.replace('rel="canonical" href="https://bilingual-subs', 'rel="canonical" href="https://wrong'), /RELEASE_HTML_CANONICAL/],
++  ['duplicate canonical', html => html.replace('</head>', '<link rel="canonical" href="https://bilingual-subs.glossquote.com/index.html">\n</head>'), /RELEASE_HTML_CANONICAL/],
++  ['wrong English alternate', html => html.replace('hreflang="en" href="https://bilingual-subs.glossquote.com/en/index.html"', 'hreflang="en" href="https://bilingual-subs.glossquote.com/index.html"'), /RELEASE_HTML_ALTERNATES/],
++  ['duplicate alternate language', html => html.replace('hreflang="x-default"', 'hreflang="en"'), /RELEASE_HTML_ALTERNATES/],
++  ['robots in body instead of head', html => html.replace('  <meta name="robots" content="index,follow">\n', '').replace('<body>', '<body>\n<meta name="robots" content="index,follow">'), /RELEASE_HTML_META/],
++  ['incorrect visible heading', html => html.replace('把兩份 SRT 合成雙語字幕', 'synthetic false heading'), /RELEASE_HTML_CONTENT/]
++]) {
++  test(`RP04/07 semantic auditor rejects ${name} even with matching forged manifest hashes`, async () => workspace(async directory => {
++    const path = 'index.html', bytes = Buffer.from(mutate(await readFile(join(directory, 'release-artifacts/site', path), 'utf8')));
++    assert.throws(() => auditReleaseHtml(bytes, path), error);
++    await writeFile(join(directory, 'release-artifacts/site', path), bytes); await forgedManifest(directory, path, bytes);
++    await rejectedWithoutWrite(directory);
++  }));
++}
++
++test('RP07/08 changed source rejected before output creation and after existing build', async () => {
++  for (const built of [false, true]) await workspace(async directory => {
++    const source = join(directory, 'public/js/app.js'); await writeFile(source, (await readFile(source, 'utf8')) + '\n// synthetic source change\n');
++    await rejectedWithoutWrite(directory, /RELEASE_SOURCE_CHANGED/);
++  }, { built });
++});
++
++test('RP03 unknown source file rejected before writes', async () => workspace(async directory => {
++  await writeFile(join(directory, 'public/unmanaged.txt'), 'synthetic'); await rejectedWithoutWrite(directory, /UNKNOWN_FILE/);
++}, { built: false }));
++
++test('RP03 unmanaged empty or partial output is not adopted or overwritten', async () => {
++  for (const partial of [false, true]) await workspace(async directory => {
++    const output = join(directory, 'release-artifacts'); await mkdir(output);
++    if (partial) { await mkdir(join(output, 'site')); await writeFile(join(output, 'site/index.html'), 'synthetic preserve'); }
++    await rejectedWithoutWrite(directory, /RELEASE_UNMANAGED_OUTPUT/);
++  }, { built: false });
++});
++
++for (const scope of ['source-js', 'site', 'release-root']) {
++  test(`RP03 ${scope} junction rejected without following or changing it`, async () => workspace(async directory => {
++    const original = scope === 'source-js' ? join(directory, 'public/js') : scope === 'site' ? join(directory, 'release-artifacts/site') : join(directory, 'release-artifacts');
++    const target = join(directory, 'synthetic-junction-target');
++    // Both exact resolved paths are checked before moving a recursive directory on Windows.
++    assert.ok(inside(directory, resolve(original)) && inside(directory, resolve(target)));
++    await rename(original, target); await symlink(target, original, 'junction');
++    await rejectedWithoutWrite(directory, /LINK_|RELEASE_DIRECTORY_UNSAFE|RELEASE_LINK/);
++  }));
++}
+warning: in the working copy of 'tool-projects/50-subtitle-bilingual/evidence/m1b/baseline/test/toolchain.test.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tool-projects/50-subtitle-bilingual/test/toolchain.test.mjs', LF will be replaced by CRLF the next time Git touches it
+diff --git a/evidence/m1b/baseline/test/toolchain.test.mjs b/test/toolchain.test.mjs
+index 90c81c7..8cfc080 100644
+--- a/evidence/m1b/baseline/test/toolchain.test.mjs
++++ b/test/toolchain.test.mjs
+@@ -10,7 +10,7 @@ import { handleRequest } from '../scripts/serve.mjs';
+ import { copy } from '../public/js/i18n.js';
+ 
+ const root = fileURLToPath(new URL('../', import.meta.url));
+-const fixtureRoot = resolve(root, 'evidence/m1/test-workspaces');
++const fixtureRoot = resolve(root, 'evidence/m1b/test-workspaces');
+ async function workspace(action) {
+   await mkdir(fixtureRoot, { recursive: true });
+   const directory = await mkdtemp(join(fixtureRoot, 'synthetic-'));

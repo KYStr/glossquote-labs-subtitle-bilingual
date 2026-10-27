@@ -1,0 +1,6 @@
+{
+  "synthetic": true,
+  "bytes": 36,
+  "sha256": "1ad73bd6afbbfee65042fa8dc9d127f0f7fb66025138d31bc1fd66712db47224",
+  "oracle": "handwritten EXPECTED constant; byte equality verified"
+}

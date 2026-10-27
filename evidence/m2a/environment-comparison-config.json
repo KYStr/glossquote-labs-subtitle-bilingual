@@ -1,0 +1,5 @@
+{
+  "Status": "PASS",
+  "CompleteSnapshotsEqual": true,
+  "Scope": "Config-only phase, 153/153 tests; preserved before redirect steering"
+}
